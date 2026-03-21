@@ -14,7 +14,7 @@ document.getElementById('form').addEventListener('submit', function(e) {
   status.innerHTML = '<span class="text-gray-300">Mencari slip gaji...</span>';
 
   // Format nomor pegawai (sesuaikan jika perlu leading zero atau tidak)
-  const nomorFormatted = nomor.padStart(6, '0');   // misal 1234 → 001234
+  const nomorFormatted = nomor;   // misal 1234 → 001234
   // const nomorFormatted = nomor;                    // tanpa padding, pakai ini jika nomor sudah fix
 
   const namaBulan = {
