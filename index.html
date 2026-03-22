@@ -157,7 +157,7 @@
 
     // Format nama file → sesuaikan dengan yang ada di server/folder slips
     const fileName = `${nip}.pdf`;
-    const pdfPath = `slips/${fileName}`;   // ubah path sesuai struktur folder
+    const pdfPath = `files/${tahun}/${bulan}/${fileName}`;   // ubah path sesuai struktur folder
 
     // Buka di tab baru dengan viewer PDF.js
     const viewerUrl = `pdfjs/web/viewer.html?file=${encodeURIComponent(pdfPath)}`;
