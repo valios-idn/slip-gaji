@@ -1,242 +1,244 @@
 [
   {
-    "NIP": "197001161992031000",
-    "NamaFile": "JAMES AWAEH,S.SOS",
-    "Password": "16011970"
+    "197001161992031000": {
+      "file": "JAMES AWAEH,S.SOS",
+      "Password": "16011970"
+    }
+  {
+    "197401101998032004": {
+      "file": "MISSEL SAHAMBE",
+      "Password": "10011974"
+    }
+  {
+    "197306121998031006": {
+      "file": "MARTHEN Z MONTONG,S,SOS",
+      "Password": "12061973"
+    }
+  {
+    "199208152022031002": {
+      "file": "JAMIL MA'RUF,S.E.",
+      "Password": "15081992"
+    }
+  {
+    "199503272022032007": {
+      "file": "HERLINA LUKMAN,S.SOS",
+      "Password": "27031995"
+    }
+  {
+    "199606042022031014": {
+      "file": "ARJUN NURDIN,S.Tr.T",
+      "Password": "04061996"
+    }
+  {
+    "199206232022032004": {
+      "file": "RAHMA NINGSI,A.Md",
+      "Password": "23061992"
+    }
+  {
+    "199601292022031004": {
+      "file": "RAMADHANI SETIA ADI NUGRAHA,A.Md.Ak",
+      "Password": "29011996"
+    }
+  {
+    "199807122022032016": {
+      "file": "FITRIANI RUSDI,A.Md.A.B",
+      "Password": "12071998"
+    }
+  {
+    "200007102022032001": {
+      "file": "AISYAH FIRDAYATI HAFID,A.Md.A.P",
+      "Password": "10072000"
+    }
+  {
+    "199707052022032009": {
+      "file": "MARYAM GUNAWAN,A.Md",
+      "Password": "05071997"
+    }
+  {
+    "200203152025042003": {
+      "file": "PATRICIA SADIAKA",
+      "Password": "15032002"
+    }
+  {
+    "199109152025041001": {
+      "file": "CANDRA NAIN HAPANTENDA",
+      "Password": "15091991"
+    }
+  {
+    "199412072025041004": {
+      "file": "DIPO DWI PERKASA",
+      "Password": "07121994"
+    }
+  {
+    "199403302025041002": {
+      "file": "HERWIN GEVIN",
+      "Password": "30031994"
+    }
+  {
+    "199611222025042003": {
+      "file": "KRISTINE MANGUNDAP",
+      "Password": "22111996"
+    }
+  {
+    "199905012025042002": {
+      "file": "MARIATUL",
+      "Password": "01051999"
+    }
+  {
+    "199008052025041003": {
+      "file": "ADI SETIAWAN",
+      "Password": "05081990"
+    }
+  {
+    "200001012025062027": {
+      "file": "MILANIA DAFFA RAMADHANI",
+      "Password": "01012000"
+    }
+  {
+    "199912092025042001": {
+      "file": "BELLA SAVIORANI ROMPAS",
+      "Password": "09121999"
+    }
+  {
+    "198504212025212027": {
+      "file": "AAN DWIJAYANTI, S.M.",
+      "Password": "21041985"
+    }
+  {
+    "198610092022211006": {
+      "file": "ALDIF RIVAN BAWOEL",
+      "Password": "09101986"
+    }
+  {
+    "196808252022211001": {
+      "file": "ALEXANDER DALENGKADE",
+      "Password": "25081968"
+    }
+  {
+    "198506262022211013": {
+      "file": "ALFA MAURI",
+      "Password": "26061985"
+    }
+  {
+    "198904172022212008": {
+      "file": "ALVRINA TAMARINDANG",
+      "Password": "17041989"
+    }
+  {
+    "198708092025211045": {
+      "file": "AMIR YUSUF",
+      "Password": "09081987"
+    }
+  {
+    "198508092022211016": {
+      "file": "ANDREW AUGUST JOHANES PORAJOW,A.Md.KP",
+      "Password": "09081985"
+    }
+  {
+    "197909302022211005": {
+      "file": "ANTHONIUS LAHAUBE, S.E",
+      "Password": "30091979"
+    }
+  {
+    "197904242022212012": {
+      "file": "ARSITINI LAHAWIA, SS",
+      "Password": "24041979"
+    }
+  {
+    "198807092022212009": {
+      "file": "AZIZAH ABUSAENG",
+      "Password": "09071988"
+    }
+  {
+    "198406042025211047": {
+      "file": "DAVID YUSAK LAHAWIA",
+      "Password": "04061984"
+    }
+  {
+    "196911042025212004": {
+      "file": "HADIJA MAKAGANSA",
+      "Password": "04111969"
+    }
+  {
+    "197208302025211011": {
+      "file": "HENDRICO LUMBANTOBING",
+      "Password": "30081972"
+    }
+  {
+    "199004152022212019": {
+      "file": "HERLIEN INEKCELSIS TAKASIHAENG",
+      "Password": "15041990"
+    }
+  {
+    "198304082022211010": {
+      "file": "JULFAN GAFAR",
+      "Password": "08041983"
+    }
+  {
+    "198710282022211010": {
+      "file": "KALEP LUKAS",
+      "Password": "28101987"
+    }
+  {
+    "197503242022211005": {
+      "file": "MARTHENS REYNHOLD PARERA",
+      "Password": "24031975"
+    }
+  {
+    "198405122025211061": {
+      "file": "MELKISEDEK DIAMARE, S.A.P.",
+      "Password": "12051984"
+    }
+  {
+    "197712082022212007": {
+      "file": "MERRY KHRISTIN SASENGA, S.I.Kom",
+      "Password": "08121977"
+    }
+  {
+    "197307122025211022": {
+      "file": "NATURAL KAEHE",
+      "Password": "12071973"
+    }
+  {
+    "198811042024211001": {
+      "file": "NEEDYA JUMEL JOHANIS, SIP.",
+      "Password": "04111988"
+    }
   },
   {
-    "NIP": "197401101998032004",
-    "NamaFile": "MISSEL SAHAMBE",
-    "Password": "10011974"
-  },
+    "198110082022212018": {
+      "file": "OLVY SISYE LUSYILLE JANIS",
+      "Password": "08101981"
+    }
   {
-    "NIP": "197306121998031006",
-    "NamaFile": "MARTHEN Z MONTONG,S,SOS",
-    "Password": "12061973"
-  },
+    "197709072025211026": {
+      "file": "RANDWYK STEVEN GAGHAUBE",
+      "Password": "07091977"
+    }
   {
-    "NIP": "199208152022031002",
-    "NamaFile": "JAMIL MA'RUF,S.E.",
-    "Password": "15081992"
-  },
+    "199004272024211002": {
+      "file": "RASIT PETONENGAN, S.E.",
+      "Password": "27041990"
+    }
   {
-    "NIP": "199503272022032007",
-    "NamaFile": "HERLINA LUKMAN,S.SOS",
-    "Password": "27031995"
-  },
+    "199109042024212001": {
+      "file": "RUTMIATI MANAHEDE, A.Md.Kom.",
+      "Password": "04091991"
+    }
   {
-    "NIP": "199606042022031014",
-    "NamaFile": "ARJUN NURDIN,S.Tr.T",
-    "Password": "04061996"
-  },
+    "198709292022212017": {
+      "file": "SRIYANI MARTHA ROPIAH",
+      "Password": "29091987"
+    }
   {
-    "NIP": "199206232022032004",
-    "NamaFile": "RAHMA NINGSI,A.Md",
-    "Password": "23061992"
-  },
+    "198910212022212008": {
+      "file": "SULASTRI MENAUNG",
+      "Password": "21101989"
+    }
   {
-    "Nip": "199601292022031004",
-    "NamaFile": "RAMADHANI SETIA ADI NUGRAHA,A.Md.Ak",
-    "Password": "29011996"
-  },
-  {
-    "NIP": "199807122022032016",
-    "NamaFile": "FITRIANI RUSDI,A.Md.A.B",
-    "Password": "12071998"
-  },
-  {
-    "NIP": "200007102022032001",
-    "NamaFile": "AISYAH FIRDAYATI HAFID,A.Md.A.P",
-    "Password": "10072000"
-  },
-  {
-    "NIP": "199707052022032009",
-    "NamaFile": "MARYAM GUNAWAN,A.Md",
-    "Password": "05071997"
-  },
-  {
-    "NIP": "200203152025042003",
-    "NamaFile": "PATRICIA SADIAKA",
-    "Password": "15032002"
-  },
-  {
-    "NIP": "199109152025041001",
-    "NamaFile": "CANDRA NAIN HAPANTENDA",
-    "Password": "15091991"
-  },
-  {
-    "NIP": "199412072025041004",
-    "NamaFile": "DIPO DWI PERKASA",
-    "Password": "07121994"
-  },
-  {
-    "NIP": "199403302025041002",
-    "NamaFile": "HERWIN GEVIN",
-    "Password": "30031994"
-  },
-  {
-    "NIP": "199611222025042003",
-    "NamaFile": "KRISTINE MANGUNDAP",
-    "Password": "22111996"
-  },
-  {
-    "NIP": "199905012025042002",
-    "NamaFile": "MARIATUL",
-    "Password": "01051999"
-  },
-  {
-    "NIP": "199008052025041003",
-    "NamaFile": "ADI SETIAWAN",
-    "Password": "05081990"
-  },
-  {
-    "NIP": "200001012025062027",
-    "NamaFile": "MILANIA DAFFA RAMADHANI",
-    "Password": "01012000"
-  },
-  {
-    "NIP": "199912092025042001",
-    "NamaFile": "BELLA SAVIORANI ROMPAS",
-    "Password": "09121999"
-  },
-  {
-    "NIP": "198504212025212027",
-    "NamaFile": "AAN DWIJAYANTI, S.M.",
-    "Password": "21041985"
-  },
-  {
-    "NIP": "198610092022211006",
-    "NamaFile": "ALDIF RIVAN BAWOEL",
-    "Password": "09101986"
-  },
-  {
-    "NIP": "196808252022211001",
-    "NamaFile": "ALEXANDER DALENGKADE",
-    "Password": "25081968"
-  },
-  {
-    "NIP": "198506262022211013",
-    "NamaFile": "ALFA MAURI",
-    "Password": "26061985"
-  },
-  {
-    "NIP": "198904172022212008",
-    "NamaFile": "ALVRINA TAMARINDANG",
-    "Password": "17041989"
-  },
-  {
-    "NIP": "198708092025211045",
-    "NamaFile": "AMIR YUSUF",
-    "Password": "09081987"
-  },
-  {
-    "NIP": "198508092022211016",
-    "NamaFile": "ANDREW AUGUST JOHANES PORAJOW,A.Md.KP",
-    "Password": "09081985"
-  },
-  {
-    "NIP": "197909302022211005",
-    "NamaFile": "ANTHONIUS LAHAUBE, S.E",
-    "Password": "30091979"
-  },
-  {
-    "NIP": "197904242022212012",
-    "NamaFile": "ARSITINI LAHAWIA, SS",
-    "Password": "24041979"
-  },
-  {
-    "NIP": "198807092022212009",
-    "NamaFile": "AZIZAH ABUSAENG",
-    "Password": "09071988"
-  },
-  {
-    "NIP": "198406042025211047",
-    "NamaFile": "DAVID YUSAK LAHAWIA",
-    "Password": "04061984"
-  },
-  {
-    "NIP": "196911042025212004",
-    "NamaFile": "HADIJA MAKAGANSA",
-    "Password": "04111969"
-  },
-  {
-    "NIP": "197208302025211011",
-    "NamaFile": "HENDRICO LUMBANTOBING",
-    "Password": "30081972"
-  },
-  {
-    "NIP": "199004152022212019",
-    "NamaFile": "HERLIEN INEKCELSIS TAKASIHAENG",
-    "Password": "15041990"
-  },
-  {
-    "NIP": "198304082022211010",
-    "Nama": "JULFAN GAFAR",
-    "Password": "08041983"
-  },
-  {
-    "NIP": "198710282022211010",
-    "NamaFile": "KALEP LUKAS",
-    "Password": "28101987"
-  },
-  {
-    "NIP": "197503242022211005",
-    "NamaFile": "MARTHENS REYNHOLD PARERA",
-    "Password": "24031975"
-  },
-  {
-    "NIP": "198405122025211061",
-    "NamaFile": "MELKISEDEK DIAMARE, S.A.P.",
-    "Password": "12051984"
-  },
-  {
-    "NIP": "197712082022212007",
-    "NamaFile": "MERRY KHRISTIN SASENGA, S.I.Kom",
-    "Password": "08121977"
-  },
-  {
-    "NIP": "197307122025211022",
-    "NamaFile": "NATURAL KAEHE",
-    "Password": "12071973"
-  },
-  {
-    "NIP": "198811042024211001",
-    "NamaFile": "NEEDYA JUMEL JOHANIS, SIP.",
-    "Password": "04111988"
-  },
-  {
-    "NIP": "198110082022212018",
-    "NamaFile": "OLVY SISYE LUSYILLE JANIS",
-    "Password": "08101981"
-  },
-  {
-    "NIP": "197709072025211026",
-    "NamaFile": "RANDWYK STEVEN GAGHAUBE",
-    "Password": "07091977"
-  },
-  {
-    "NIP": "199004272024211002",
-    "NamaFile": "RASIT PETONENGAN, S.E.",
-    "Password": "27041990"
-  },
-  {
-    "NIP": "199109042024212001",
-    "NamaFile": "RUTMIATI MANAHEDE, A.Md.Kom.",
-    "Password": "04091991"
-  },
-  {
-    "NIP": "198709292022212017",
-    "NamaFile": "SRIYANI MARTHA ROPIAH",
-    "Password": "29091987"
-  },
-  {
-    "NIP": "198910212022212008",
-    "NamaFile": "SULASTRI MENAUNG",
-    "Password": "21101989"
-  },
-  {
-    "NIP": "198403152022212018",
-    "NamaFile": "SUMIATI MABOKO",
-    "Password": "15031984"
-  }
+    "198403152022212018": {
+      "file": "SUMIATI MABOKO",
+      "Password": "15031984"
+    }
+    ]
 ]
