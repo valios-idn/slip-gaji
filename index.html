@@ -3,182 +3,165 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Akses PDF - Langsung Buka / Download</title>
+  <title>Portal Slip Gaji Karyawan</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
     body {
-      font-family: system-ui, sans-serif;
-      background: linear-gradient(to bottom, #e0f2fe, #bae6fd);
+      font-family: 'Segoe UI', system-ui, sans-serif;
       min-height: 100vh;
-      margin: 0;
+      background: var(--bg);
+      color: white;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 20px;
-      box-sizing: border-box;
     }
     .card {
-      background: white;
-      border-radius: 16px;
-      padding: 2.5rem 2rem;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 40px 35px;
       width: 100%;
-      max-width: 460px;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+      max-width: 480px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+      color: #1e293b;
       text-align: center;
     }
     h1 {
-      color: #1e40af;
-      margin: 0 0 1.8rem;
-      font-size: 1.6rem;
+      font-size: 2.1rem;
+      margin-bottom: 12px;
+      color: var(--primary-dark);
+    }
+    .subtitle {
+      color: #64748b;
+      margin-bottom: 32px;
+    }
+    .form-group {
+      margin-bottom: 24px;
+      text-align: left;
     }
     label {
       display: block;
-      margin: 1.2rem 0 0.5rem;
-      font-weight: 500;
+      margin-bottom: 8px;
+      font-weight: 600;
       color: #334155;
-      text-align: left;
     }
     input, select {
       width: 100%;
-      padding: 0.85rem;
-      border: 1px solid #94a3b8;
-      border-radius: 8px;
+      padding: 14px 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
       font-size: 1rem;
-      box-sizing: border-box;
+      transition: all 0.25s;
     }
     input:focus, select:focus {
       outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(99,102,241,0.15);
     }
     button {
       width: 100%;
-      margin-top: 2rem;
-      padding: 1rem;
-      background: #2563eb;
+      padding: 16px;
+      background: var(--primary);
       color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 1.1rem;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.3s;
+      margin-top: 12px;
     }
     button:hover {
-      background: #1d4ed8;
-      transform: translateY(-1px);
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(99,102,241,0.3);
     }
-    .message {
-      margin-top: 1.5rem;
-      font-size: 0.95rem;
-      color: #475569;
+    .icon {
+      font-size: 3.5rem;
+      color: var(--primary);
+      margin-bottom: 20px;
     }
-    .error {
-      color: #dc2626;
-      font-weight: 500;
-      margin-top: 1rem;
-    }
-    .info {
-      margin-top: 2rem;
-      font-size: 0.85rem;
-      color: #64748b;
+    @media (max-width: 500px) {
+      .card { padding: 30px 20px; }
     }
   </style>
 </head>
 <body>
 
 <div class="card">
-  <h1>Slip Gaji RRI Tahuna</h1>
+  <i class="fas fa-file-invoice-dollar icon"></i>
+  <h1>Portal Slip Gaji</h1>
+  <p class="subtitle">Masukkan data untuk melihat slip gaji Anda</p>
 
-  <form id="pdfForm">
-    <label for="tahun">Tahun</label>
-    <select id="tahun" required>
-      <option value="">Pilih tahun...</option>
-      <option value="2026">2026</option>
-      <option value="2027">2027</option>
-      <option value="2028">2028</option>
-      <!-- tambah tahun lain jika perlu -->
-    </select>
+  <form id="formCari">
+    <div class="form-group">
+      <label for="nip">Nomor Pegawai / NIP</label>
+      <input type="text" id="nip" placeholder="Contoh: 10234 atau 19920312" required/>
+    </div>
 
-    <label for="bulan">Bulan</label>
-    <select id="bulan" required>
-      <option value="">Pilih bulan...</option>
-      <option value="01_Januari">Januari</option>
-      <option value="02_Februari">Februari</option>
-      <option value="03_Maret">Maret</option>
-      <option value="04_April">April</option>
-      <option value="05_Mei">Mei</option>
-      <option value="06_Juni">Juni</option>
-      <option value="07_Juli">Juli</option>
-      <option value="08_Agustus">Agustus</option>
-      <option value="09_September">September</option>
-      <option value="10_Oktober">Oktober</option>
-      <option value="11_November">November</option>
-      <option value="12_Desember">Desember</option>
-    </select>
+    <div class="form-group">
+      <label for="tahun">Tahun</label>
+      <select id="tahun" required>
+        <option value="">Pilih Tahun</option>
+        <option value="2023">2023</option>
+        <option value="2024">2024</option>
+        <option value="2025">2025</option>
+        <option value="2026" selected>2026</option>
+      </select>
+    </div>
 
-    <label for="nama">NIP / NIPPPK</label>
-    <input type="text" id="nama" placeholder="Contoh: 199601292022031004" required />
+    <div class="form-group">
+      <label for="bulan">Bulan</label>
+      <select id="bulan" required>
+        <option value="">Pilih Bulan</option>
+        <option value="01">Januari</option>
+        <option value="02">Februari</option>
+        <option value="03">Maret</option>
+        <option value="04">April</option>
+        <option value="05">Mei</option>
+        <option value="06">Juni</option>
+        <option value="07">Juli</option>
+        <option value="08">Agustus</option>
+        <option value="09">September</option>
+        <option value="10">Oktober</option>
+        <option value="11">November</option>
+        <option value="12">Desember</option>
+      </select>
+    </div>
 
-    <button type="submit">Download</button>
+    <button type="submit">
+      <i class="fas fa-eye"></i> Tampilkan Slip Gaji
+    </button>
   </form>
-
-  <div id="pesan" class="message"></div>
-  <div id="error" class="error"></div>
-
-  <div class="info">
-    File akan dibuka langsung di tab baru.<br>
-    Jika tidak terbuka otomatis → klik kanan → "Save link as..." untuk download.
-  </div>
 </div>
 
 <script>
-  const form = document.getElementById('pdfForm');
-  const pesan = document.getElementById('pesan');
-  const errorDiv = document.getElementById('error');
-
-  form.addEventListener('submit', function(e) {
+  document.getElementById('formCari').addEventListener('submit', function(e) {
     e.preventDefault();
-
+    
+    const nip   = document.getElementById('nip').value.trim();
     const tahun = document.getElementById('tahun').value;
     const bulan = document.getElementById('bulan').value;
-    const nama = document.getElementById('nama').value.trim();
 
-    errorDiv.textContent = '';
-    pesan.textContent = '';
-
-    if (!tahun || !bulan || !nama) {
-      errorDiv.textContent = 'Harap isi semua kolom!';
+    if (!nip || !tahun || !bulan) {
+      alert('Harap isi semua field!');
       return;
     }
 
-    const baseUrl = 'https://raw.githubusercontent.com/madhagaskar182/testing/main/files/';
-    const filePath = `${tahun}/${bulan}/${nama}.pdf`;
-    const fullUrl = baseUrl + filePath;
+    // Format nama file → sesuaikan dengan yang ada di server/folder slips
+    const fileName = `slipgaji_${nip}_${tahun}_${bulan}.pdf`;
+    const pdfPath = `slips/${fileName}`;   // ubah path sesuai struktur folder
 
-
-    // Membuka di tab baru
-    const newTab = window.open(fullUrl, '_blank');
-
-    // Cek apakah popup diblokir
-    if (!newTab || newTab.closed || typeof newTab.closed === 'undefined') {
-      errorDiv.textContent = 'Popup diblokir browser. Silakan izinkan popup atau klik link ini:';
-      
-      const link = document.createElement('a');
-      link.href = fullUrl;
-      link.textContent = 'Klik di sini untuk download PDF';
-      link.target = '_blank';
-      link.style.display = 'block';
-      link.style.marginTop = '1rem';
-      link.style.color = '#2563eb';
-      link.style.fontWeight = '500';
-      
-      pesan.innerHTML = '';
-      pesan.appendChild(link);
-    } else {
-      setTimeout(() => {
-        pesan.textContent = 'File sedang dimuat di tab baru...';
-      }, 800);
-    }
+    // Buka di tab baru dengan viewer PDF.js
+    const viewerUrl = `pdfjs/web/viewer.html?file=${encodeURIComponent(pdfPath)}`;
+    window.open(viewerUrl, '_blank');
   });
 </script>
 
