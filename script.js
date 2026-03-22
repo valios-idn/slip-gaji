@@ -81,3 +81,8 @@ document.getElementById('downloadBtn').addEventListener('click', async () => {
     alert('Gagal download file');
   }
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+  const tahunSekarang = new Date().getFullYear();
+  document.getElementById('tahun').value = tahunSekarang;
+});
