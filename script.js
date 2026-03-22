@@ -1,13 +1,36 @@
 const form = document.getElementById('pdfForm');
-const viewer = document.getElementById('viewerContainer');
 const pesan = document.getElementById('pesan');
 const errorDiv = document.getElementById('error');
-const downloadBtn = document.getElementById('downloadBtn');
+const canvas = document.getElementById('pdfCanvas');
+const ctx = canvas.getContext('2d');
+const viewer = document.getElementById('viewerContainer');
 
+const prevBtn = document.getElementById('prev');
+const nextBtn = document.getElementById('next');
+const downloadBtn = document.getElementById('downloadBtn');
+const pageInfo = document.getElementById('pageInfo');
+
+let pdfDoc = null;
+let currentPage = 1;
 let currentUrl = '';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+async function renderPage(num) {
+  const page = await pdfDoc.getPage(num);
+  const viewport = page.getViewport({ scale: 1.5 });
+
+  canvas.height = viewport.height;
+  canvas.width = viewport.width;
+
+  await page.render({
+    canvasContext: ctx,
+    viewport: viewport
+  }).promise;
+
+  pageInfo.textContent = `Halaman ${num} dari ${pdfDoc.numPages}`;
+}
 
 form.addEventListener('submit', async function(e) {
   e.preventDefault();
@@ -20,7 +43,6 @@ form.addEventListener('submit', async function(e) {
 
   errorDiv.textContent = '';
   pesan.textContent = '';
-  viewer.innerHTML = '';
   viewer.style.display = 'none';
 
   if (!tahun || !bulan || !nama) {
@@ -31,7 +53,7 @@ form.addEventListener('submit', async function(e) {
   const baseUrl = 'https://raw.githubusercontent.com/madhagaskar182/testing/main/files/';
   const url = `${baseUrl}${tahun}/${bulan}/${nama}.pdf`;
 
-  pesan.textContent = 'Memuat semua halaman PDF...';
+  pesan.textContent = 'Memuat PDF...';
 
   try {
     const check = await fetch(url, { method: 'HEAD' });
@@ -39,36 +61,31 @@ form.addEventListener('submit', async function(e) {
 
     currentUrl = url;
 
-    const pdf = await pdfjsLib.getDocument(url).promise;
+    pdfDoc = await pdfjsLib.getDocument(url).promise;
+    currentPage = 1;
 
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-
-      const viewport = page.getViewport({ scale: 1.4 });
-
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
-
-      viewer.appendChild(canvas);
-
-      await page.render({
-        canvasContext: ctx,
-        viewport: viewport
-      }).promise;
-    }
+    await renderPage(currentPage);
 
     viewer.style.display = 'block';
-    pesan.textContent = 'Semua halaman berhasil ditampilkan';
+    pesan.textContent = '';
 
   } catch (err) {
     errorDiv.textContent = err.message;
   }
 });
 
-// DOWNLOAD
+prevBtn.onclick = () => {
+  if (currentPage <= 1) return;
+  currentPage--;
+  renderPage(currentPage);
+};
+
+nextBtn.onclick = () => {
+  if (currentPage >= pdfDoc.numPages) return;
+  currentPage++;
+  renderPage(currentPage);
+};
+
 downloadBtn.onclick = () => {
   if (!currentUrl) return;
 
