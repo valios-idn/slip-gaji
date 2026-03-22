@@ -3,150 +3,259 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Portal Slip Gaji Karyawan</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <title>Viewer PDF + Download</title>
+
+  <!-- PDF.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
   <style>
-    :root {
-      --primary: #6366f1;
-      --primary-dark: #4f46e5;
-      --bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-    * { margin:0; padding:0; box-sizing:border-box; }
     body {
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      min-height: 100vh;
-      background: var(--bg);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      font-family: system-ui, sans-serif;
+      background: linear-gradient(to bottom, #e0f2fe, #bae6fd);
+      margin: 0;
       padding: 20px;
+      display: flex;
+      justify-content: center;
     }
+
     .card {
-      background: rgba(255,255,255,0.95);
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      padding: 40px 35px;
+      background: white;
+      border-radius: 16px;
+      padding: 2rem;
       width: 100%;
-      max-width: 480px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.25);
-      color: #1e293b;
+      max-width: 650px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.12);
       text-align: center;
     }
-    h1 { font-size: 2.1rem; margin-bottom: 12px; color: var(--primary-dark); }
-    .subtitle { color: #64748b; margin-bottom: 32px; }
-    .form-group { margin-bottom: 24px; text-align: left; }
-    label { display: block; margin-bottom: 8px; font-weight: 600; color: #334155; }
+
+    h1 {
+      color: #1e40af;
+    }
+
+    label {
+      display: block;
+      margin-top: 1rem;
+      text-align: left;
+    }
+
     input, select {
       width: 100%;
-      padding: 14px 16px;
-      border: 2px solid #e2e8f0;
-      border-radius: 10px;
-      font-size: 1rem;
-      transition: all 0.25s;
+      padding: 0.8rem;
+      margin-top: 0.4rem;
+      border-radius: 8px;
+      border: 1px solid #94a3b8;
     }
-    input:focus, select:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 4px rgba(99,102,241,0.15);
-    }
+
     button {
       width: 100%;
-      padding: 16px;
-      background: var(--primary);
+      margin-top: 1.2rem;
+      padding: 0.9rem;
+      background: #2563eb;
       color: white;
       border: none;
-      border-radius: 10px;
-      font-size: 1.1rem;
-      font-weight: 600;
+      border-radius: 8px;
       cursor: pointer;
-      transition: all 0.3s;
-      margin-top: 12px;
+      font-weight: bold;
     }
+
     button:hover {
-      background: var(--primary-dark);
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(99,102,241,0.3);
+      background: #1d4ed8;
     }
-    .icon { font-size: 3.5rem; color: var(--primary); margin-bottom: 20px; }
-    @media (max-width: 500px) { .card { padding: 30px 20px; } }
+
+    .message {
+      margin-top: 1rem;
+      color: #475569;
+    }
+
+    .error {
+      color: red;
+      margin-top: 1rem;
+    }
+
+    #viewerContainer {
+      margin-top: 20px;
+      display: none;
+    }
+
+    canvas {
+      width: 100%;
+      border: 1px solid #ccc;
+      margin-top: 10px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .controls button {
+      flex: 1;
+    }
+
+    .download-btn {
+      background: #16a34a;
+    }
+
+    .download-btn:hover {
+      background: #15803d;
+    }
   </style>
 </head>
 <body>
 
 <div class="card">
-  <i class="fas fa-file-invoice-dollar icon"></i>
-  <h1>Portal Slip Gaji</h1>
-  <p class="subtitle">Masukkan data untuk melihat slip gaji Anda</p>
+  <h1>Viewer PDF</h1>
 
-  <form id="formCari">
-    <div class="form-group">
-      <label for="nip">Nomor Pegawai / NIP</label>
-      <input type="text" id="nip" placeholder="Contoh: 19920312001" required/>
-    </div>
+  <form id="pdfForm">
+    <label>Tahun</label>
+    <select id="tahun" required>
+      <option value="">Pilih tahun...</option>
+      <option value="2026">2026</option>
+      <option value="2027">2027</option>
+      <option value="2028">2028</option>
+    </select>
 
-    <div class="form-group">
-      <label for="tahun">Tahun</label>
-      <select id="tahun" required>
-        <option value="">Pilih Tahun</option>
-        <option value="2025">2025</option>
-        <option value="2026" selected>2026</option>
-        <option value="2027">2027</option>
-      </select>
-    </div>
+    <label>Bulan</label>
+    <select id="bulan" required>
+      <option value="">Pilih bulan...</option>
+      <option value="01_Januari">Januari</option>
+      <option value="02_Februari">Februari</option>
+      <option value="03_Maret">Maret</option>
+      <option value="04_April">April</option>
+      <option value="05_Mei">Mei</option>
+      <option value="06_Juni">Juni</option>
+      <option value="07_Juli">Juli</option>
+      <option value="08_Agustus">Agustus</option>
+      <option value="09_September">September</option>
+      <option value="10_Oktober">Oktober</option>
+      <option value="11_November">November</option>
+      <option value="12_Desember">Desember</option>
+    </select>
 
-    <div class="form-group">
-      <label for="bulan">Bulan</label>
-      <select id="bulan" required>
-        <option value="">Pilih Bulan</option>
-        <option value="01">Januari</option>
-        <option value="02">Februari</option>
-        <option value="03">Maret</option>
-        <option value="04">April</option>
-        <option value="05">Mei</option>
-        <option value="06">Juni</option>
-        <option value="07">Juli</option>
-        <option value="08">Agustus</option>
-        <option value="09">September</option>
-        <option value="10">Oktober</option>
-        <option value="11">November</option>
-        <option value="12">Desember</option>
-      </select>
-    </div>
+    <label>Nama file (tanpa .pdf)</label>
+    <input type="text" id="nama" required />
 
-    <button type="submit">
-      <i class="fas fa-eye"></i> Tampilkan Slip Gaji
-    </button>
+    <button type="submit">Tampilkan PDF</button>
   </form>
+
+  <div id="pesan" class="message"></div>
+  <div id="error" class="error"></div>
+
+  <div id="viewerContainer">
+    <canvas id="pdfCanvas"></canvas>
+
+    <div class="controls">
+      <button id="prev">⬅ Prev</button>
+      <button id="next">Next ➡</button>
+    </div>
+
+    <button id="downloadBtn" class="download-btn">⬇ Download PDF</button>
+
+    <div class="message" id="pageInfo"></div>
+  </div>
 </div>
 
 <script>
-  document.getElementById('formCari').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const nip   = document.getElementById('nip').value.trim();
-    const tahun = document.getElementById('tahun').value;
-    const bulan = document.getElementById('bulan').value;
+const form = document.getElementById('pdfForm');
+const pesan = document.getElementById('pesan');
+const errorDiv = document.getElementById('error');
+const canvas = document.getElementById('pdfCanvas');
+const ctx = canvas.getContext('2d');
+const viewer = document.getElementById('viewerContainer');
 
-    if (!nip || !tahun || !bulan) {
-      alert('Harap isi semua field dengan lengkap!');
-      return;
-    }
+const prevBtn = document.getElementById('prev');
+const nextBtn = document.getElementById('next');
+const downloadBtn = document.getElementById('downloadBtn');
+const pageInfo = document.getElementById('pageInfo');
 
-    // Format path sesuai struktur folder: slips/tahun/bulan/nomor_pegawai.pdf
-    // Contoh: slips/2025/03/10234.pdf
-    const fileName = `${nip}.pdf`;                   // ← hanya nomor pegawai
-    const pdfPath = `files/${tahun}/${bulan}/${fileName}`;
-files/2026/01/199601292022031004.pdf
-    // Jika pakai pdf.js viewer (direkomendasikan agar tampilan lebih bagus & konsisten)
-    const viewerUrl = `pdfjs/web/viewer.html?file=${encodeURIComponent(pdfPath)}`;
-    
-    // Buka di tab baru
-    window.open(viewerUrl, '_blank');
+let pdfDoc = null;
+let currentPage = 1;
+let currentUrl = '';
 
-    // Alternatif sederhana (tanpa pdf.js viewer) → langsung buka PDF:
-    // window.open(pdfPath, '_blank');
-  });
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+async function renderPage(num) {
+  const page = await pdfDoc.getPage(num);
+  const viewport = page.getViewport({ scale: 1.5 });
+
+  canvas.height = viewport.height;
+  canvas.width = viewport.width;
+
+  await page.render({
+    canvasContext: ctx,
+    viewport: viewport
+  }).promise;
+
+  pageInfo.textContent = `Halaman ${num} dari ${pdfDoc.numPages}`;
+}
+
+form.addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  const tahun = document.getElementById('tahun').value;
+  const bulan = document.getElementById('bulan').value;
+  const nama = document.getElementById('nama').value
+    .trim()
+    .replace(/[^a-zA-Z0-9_-]/g, '');
+
+  errorDiv.textContent = '';
+  pesan.textContent = '';
+  viewer.style.display = 'none';
+
+  if (!tahun || !bulan || !nama) {
+    errorDiv.textContent = 'Harap isi semua kolom!';
+    return;
+  }
+
+  const baseUrl = 'https://raw.githubusercontent.com/madhagaskar182/testing/main/files/';
+  const url = `${baseUrl}${tahun}/${bulan}/${nama}.pdf`;
+
+  pesan.textContent = 'Memuat PDF...';
+
+  try {
+    const check = await fetch(url, { method: 'HEAD' });
+    if (!check.ok) throw new Error('File tidak ditemukan');
+
+    currentUrl = url;
+
+    pdfDoc = await pdfjsLib.getDocument(url).promise;
+    currentPage = 1;
+
+    await renderPage(currentPage);
+
+    viewer.style.display = 'block';
+    pesan.textContent = '';
+
+  } catch (err) {
+    errorDiv.textContent = err.message;
+  }
+});
+
+prevBtn.onclick = () => {
+  if (currentPage <= 1) return;
+  currentPage--;
+  renderPage(currentPage);
+};
+
+nextBtn.onclick = () => {
+  if (currentPage >= pdfDoc.numPages) return;
+  currentPage++;
+  renderPage(currentPage);
+};
+
+// DOWNLOAD
+downloadBtn.onclick = () => {
+  if (!currentUrl) return;
+
+  const link = document.createElement('a');
+  link.href = currentUrl;
+  link.download = '';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
 </script>
 
 </body>
