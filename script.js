@@ -9,22 +9,23 @@ let currentUrl = '';
 let currentFileName = '';
 let dataPegawai = {};
 
-// 🔥 Load JSON pegawai
+// load JSON
 async function loadData() {
   try {
     const res = await fetch('pegawai.json');
     dataPegawai = await res.json();
+    console.log('Data pegawai loaded:', dataPegawai);
   } catch (err) {
     console.error('Gagal load JSON:', err);
   }
 }
 loadData();
 
-// PDF worker
+// worker
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-// SUBMIT FORM
+// SUBMIT
 form.addEventListener('submit', async function(e) {
   e.preventDefault();
 
@@ -36,15 +37,14 @@ form.addEventListener('submit', async function(e) {
   pesan.textContent = '';
   viewerContainer.style.display = 'none';
 
-  // 🔥 HAPUS CANVAS SAJA (biar tombol tidak hilang)
-  viewer.querySelectorAll('canvas').forEach(c => c.remove());
+  // hapus canvas lama
+  viewer.innerHTML = '';
 
   if (!tahun || !bulan || !nip) {
     errorDiv.textContent = 'Harap isi semua kolom!';
     return;
   }
 
-  // cek NIP
   if (!dataPegawai[nip]) {
     errorDiv.textContent = 'Nomor pegawai tidak terdaftar!';
     return;
@@ -53,24 +53,25 @@ form.addEventListener('submit', async function(e) {
   const namaFile = dataPegawai[nip];
   currentFileName = namaFile + '.pdf';
 
-  // 🔥 pakai CDN (lebih stabil)
   const baseUrl = 'https://cdn.jsdelivr.net/gh/madhagaskar182/testing@main/files/';
   const url = `${baseUrl}${tahun}/${bulan}/${namaFile}.pdf`;
+
+  console.log('URL PDF:', url);
 
   pesan.textContent = 'Memuat slip gaji...';
 
   try {
-    const check = await fetch(url, { method: 'HEAD' });
-    if (!check.ok) throw new Error('File tidak ditemukan');
-
+    // langsung load (tanpa HEAD biar tidak gagal)
     currentUrl = url;
 
     const pdf = await pdfjsLib.getDocument(url).promise;
 
-    // render semua halaman
+    console.log('Jumlah halaman:', pdf.numPages);
+
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
-      const viewport = page.getViewport({ scale: 1.4 });
+
+      const viewport = page.getViewport({ scale: 1.3 });
 
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
@@ -90,12 +91,13 @@ form.addEventListener('submit', async function(e) {
     pesan.textContent = 'Slip gaji berhasil ditampilkan';
 
   } catch (err) {
-    errorDiv.textContent = err.message || 'Gagal memuat PDF';
+    console.error(err);
+    errorDiv.textContent = 'Gagal memuat PDF (cek file / path)';
     pesan.textContent = '';
   }
 });
 
-// ✅ DOWNLOAD (nama sesuai file asli)
+// DOWNLOAD
 downloadBtn.onclick = async () => {
   if (!currentUrl) return;
 
@@ -107,38 +109,30 @@ downloadBtn.onclick = async () => {
     const a = document.createElement('a');
 
     a.href = url;
-    a.download = currentFileName; // 🔥 nama asli
+    a.download = currentFileName;
+
     document.body.appendChild(a);
     a.click();
 
     a.remove();
     window.URL.revokeObjectURL(url);
 
-  } catch (err) {
+  } catch {
     alert('Gagal download file');
   }
 };
 
-// ✅ DEFAULT TAHUN OTOMATIS
+// default tahun
 document.addEventListener('DOMContentLoaded', () => {
-  const tahunSelect = document.getElementById('tahun');
-  const tahunSekarang = new Date().getFullYear().toString();
+  const tahun = new Date().getFullYear().toString();
+  const select = document.getElementById('tahun');
 
-  let found = false;
-
-  for (let opt of tahunSelect.options) {
-    if (opt.value === tahunSekarang) {
-      found = true;
-      break;
-    }
-  }
-
-  if (!found) {
+  if (![...select.options].some(o => o.value === tahun)) {
     const opt = document.createElement('option');
-    opt.value = tahunSekarang;
-    opt.textContent = tahunSekarang;
-    tahunSelect.appendChild(opt);
+    opt.value = tahun;
+    opt.textContent = tahun;
+    select.appendChild(opt);
   }
 
-  tahunSelect.value = tahunSekarang;
+  select.value = tahun;
 });
