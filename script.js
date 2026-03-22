@@ -89,6 +89,11 @@ form.addEventListener('submit', async function(e) {
   }
 });
 
+document.addEventListener('DOMContentLoaded', () => {
+  const tahunSekarang = new Date().getFullYear();
+  document.getElementById('tahun').value = tahunSekarang;
+});
+
 // DOWNLOAD
 downloadBtn.onclick = () => {
   if (!currentUrl) return;
