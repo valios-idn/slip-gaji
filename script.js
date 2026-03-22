@@ -5,6 +5,8 @@ const viewerContainer = document.getElementById('viewerContainer');
 const canvas = document.getElementById('pdfCanvas');
 const ctx = canvas.getContext('2d');
 
+let pdfDoc = null;
+
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
@@ -26,36 +28,27 @@ form.addEventListener('submit', async function(e) {
     return;
   }
 
-  const baseUrl = 'https://raw.githubusercontent.com/madhagaskar182/testing/main/files/';
-  const filePath = `${tahun}/${bulan}/${nama}.pdf`;
-  const fullUrl = baseUrl + filePath;
+  const baseUrl = 'https://cdn.jsdelivr.net/gh/madhagaskar182/testing@main/files/';
+  const fullUrl = `${baseUrl}${tahun}/${bulan}/${nama}.pdf`;
 
   pesan.textContent = 'Memuat PDF...';
 
   try {
-    // cek file dulu
     const response = await fetch(fullUrl, { method: 'HEAD' });
-    if (!response.ok) {
-      throw new Error('File tidak ditemukan');
-    }
+    if (!response.ok) throw new Error('File tidak ditemukan');
 
-    // load PDF
-    const loadingTask = pdfjsLib.getDocument(fullUrl);
-    const pdf = await loadingTask.promise;
+    pdfDoc = await pdfjsLib.getDocument(fullUrl).promise;
 
-    // ambil halaman pertama
-    const page = await pdf.getPage(1);
+    const page = await pdfDoc.getPage(1);
 
     const viewport = page.getViewport({ scale: 1.5 });
     canvas.height = viewport.height;
     canvas.width = viewport.width;
 
-    const renderContext = {
+    await page.render({
       canvasContext: ctx,
       viewport: viewport
-    };
-
-    await page.render(renderContext).promise;
+    }).promise;
 
     viewerContainer.style.display = 'block';
     pesan.textContent = 'PDF berhasil ditampilkan';
@@ -64,4 +57,21 @@ form.addEventListener('submit', async function(e) {
     errorDiv.textContent = err.message || 'Gagal memuat PDF';
     pesan.textContent = '';
   }
+});
+
+// tombol download
+document.getElementById('downloadBtn').addEventListener('click', () => {
+  if (!pdfDoc) return;
+
+  const tahun = document.getElementById('tahun').value;
+  const bulan = document.getElementById('bulan').value;
+  const nama = document.getElementById('nama').value;
+
+  const baseUrl = 'https://cdn.jsdelivr.net/gh/madhagaskar182/testing@main/files/';
+  const url = `${baseUrl}${tahun}/${bulan}/${nama}.pdf`;
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = nama + '.pdf';
+  a.click();
 });
