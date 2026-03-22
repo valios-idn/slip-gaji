@@ -91,3 +91,19 @@ canvas {
   margin-top: 10px;
   color: #1e40af;
 }
+
+.footer-text {
+  margin-top: 25px;
+  font-size: 11px;
+  color: #94a3b8;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+label {
+  font-weight: 600;
+  font-size: 14px;
+  display: block;
+  margin-bottom: 4px;
+  color: #334155;
+}
