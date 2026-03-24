@@ -110,6 +110,10 @@ button {
   max-height: auto;
 }
 
+/* Footer Text */
+.footer-text
+font-size: 12px;
+
 /* DOWNLOAD */
 .download-btn {
   display: block;
@@ -138,5 +142,9 @@ button {
 
   .logo {
     width: 180px;
+  }
+
+  .footer-text {
+    font-size: 7px;
   }
 }
