@@ -7,36 +7,22 @@
 
 <link rel="stylesheet" href="style-admin.css">
 <script defer src="admin.js"></script>
-
-<style>
-.login-box {
-  max-width: 400px;
-  margin: 80px auto;
-  background: white;
-  padding: 25px;
-  border-radius: 16px;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.15);
-}
-
-.hidden {
-  display: none;
-}
-</style>
-
 </head>
 
 <body>
 
+<!-- LOGIN -->
 <div id="loginPage" class="login-box">
   <h2>🔐 Login Admin</h2>
 
-  <input type="text" id="username" placeholder="Username"><br><br>
-  <input type="password" id="password" placeholder="Password"><br><br>
+  <input type="text" id="username" placeholder="Username">
+  <input type="password" id="password" placeholder="Password">
 
   <button class="btn-primary" onclick="login()">Login</button>
   <p id="loginError" style="color:red;"></p>
 </div>
 
+<!-- DASHBOARD -->
 <div id="dashboard" class="container hidden">
 
 <h2>🧑‍💼 Generator JSON Pegawai</h2>
