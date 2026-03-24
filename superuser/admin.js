@@ -1,13 +1,30 @@
 let adminData = null;
 
-// LOAD ADMIN
+// ================= LOAD ADMIN =================
 async function loadAdmin() {
-  const res = await fetch('admin.json');
-  adminData = await res.json();
+  try {
+    const res = await fetch('superuser/admin.json');
+
+    if (!res.ok) {
+      throw new Error('admin.json tidak ditemukan');
+    }
+
+    adminData = await res.json();
+
+    // cek auto login setelah data siap
+    if (localStorage.getItem('login') === 'true') {
+      showDashboard();
+    }
+
+  } catch (err) {
+    console.error(err);
+    alert('Gagal load data admin!');
+  }
 }
+
 loadAdmin();
 
-// HASH
+// ================= HASH =================
 async function hashPassword(password) {
   const data = new TextEncoder().encode(password);
   const hash = await crypto.subtle.digest('SHA-256', data);
@@ -15,10 +32,15 @@ async function hashPassword(password) {
     .map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-// LOGIN
+// ================= LOGIN =================
 async function login() {
-  const user = document.getElementById('username').value;
-  const pass = document.getElementById('password').value;
+  const user = document.getElementById('username').value.trim();
+  const pass = document.getElementById('password').value.trim();
+
+  if (!adminData) {
+    alert('Data admin belum siap!');
+    return;
+  }
 
   const hashed = await hashPassword(pass);
 
@@ -30,32 +52,27 @@ async function login() {
   }
 }
 
-// SHOW DASHBOARD
+// ================= SHOW DASHBOARD =================
 function showDashboard() {
   document.getElementById('loginPage').classList.add('hidden');
   document.getElementById('dashboard').classList.remove('hidden');
 }
 
-// LOGOUT
+// ================= LOGOUT =================
 function logout() {
   localStorage.removeItem('login');
   location.reload();
 }
 
-// AUTO LOGIN
-if (localStorage.getItem('login') === 'true') {
-  showDashboard();
-}
-
-// TABLE
+// ================= TABLE =================
 function tambahBaris() {
   const tbody = document.querySelector('#table tbody');
   const tr = document.createElement('tr');
 
   tr.innerHTML = `
-    <td><input type="text"></td>
-    <td><input type="text"></td>
-    <td><input type="text"></td>
+    <td><input type="text" placeholder="NIP"></td>
+    <td><input type="text" placeholder="Nama File"></td>
+    <td><input type="text" placeholder="Password"></td>
     <td><button class="btn-danger" onclick="hapusBaris(this)">❌</button></td>
   `;
 
@@ -66,7 +83,7 @@ function hapusBaris(btn) {
   btn.closest('tr').remove();
 }
 
-// GENERATE JSON
+// ================= GENERATE JSON =================
 async function generateJSON() {
   const rows = document.querySelectorAll('#table tbody tr');
   const data = {};
@@ -80,6 +97,7 @@ async function generateJSON() {
 
     if (!nip || !namaFile || !password) continue;
 
+    // validasi NIP
     if (!/^\d{18}$/.test(nip)) {
       alert("NIP harus 18 digit: " + nip);
       return;
@@ -97,9 +115,15 @@ async function generateJSON() {
     JSON.stringify(data, null, 2);
 }
 
-// COPY
+// ================= COPY =================
 function copyJSON() {
   const text = document.getElementById('output').textContent;
+
+  if (!text) {
+    alert('Belum ada data!');
+    return;
+  }
+
   navigator.clipboard.writeText(text);
-  alert('JSON disalin!');
+  alert('JSON berhasil disalin!');
 }
