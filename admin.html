@@ -3,23 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Admin</title>
+<title>Admin Generator JSON</title>
 
 <style>
 body {
   font-family: Arial, sans-serif;
   background: linear-gradient(to bottom, #e0f2fe, #bae6fd);
-  margin: 0;
   padding: 20px;
 }
 
 .container {
-  max-width: 900px;
+  max-width: 1000px;
   margin: auto;
   background: white;
-  padding: 25px;
+  padding: 20px;
   border-radius: 16px;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
 }
 
 h2 {
@@ -27,21 +26,31 @@ h2 {
   color: #1e40af;
 }
 
-.grid {
-  display: grid;
-  gap: 10px;
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
 }
 
-input, select, button {
-  padding: 10px;
-  border-radius: 8px;
+th, td {
+  padding: 8px;
+  border: 1px solid #ddd;
+}
+
+input {
+  width: 100%;
+  padding: 6px;
+  border-radius: 6px;
   border: 1px solid #ccc;
 }
 
 button {
+  margin-top: 10px;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
   background: #2563eb;
   color: white;
-  font-weight: bold;
   cursor: pointer;
 }
 
@@ -49,23 +58,24 @@ button:hover {
   opacity: 0.9;
 }
 
-.preview {
-  margin-top: 15px;
+.btn-danger {
+  background: red;
+}
+
+.output {
+  margin-top: 20px;
   background: #f1f5f9;
   padding: 10px;
   border-radius: 8px;
-  max-height: 200px;
+  max-height: 300px;
   overflow: auto;
-}
-
-.success {
-  color: green;
-  margin-top: 10px;
-}
-
-.file-list {
   font-size: 13px;
-  margin-top: 10px;
+}
+
+.top-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 </style>
 </head>
@@ -74,59 +84,39 @@ button:hover {
 
 <div class="container">
 
-<h2>📂 Dashboard Admin Upload PDF</h2>
+<h2>🔐 Generator JSON Pegawai</h2>
 
-<div class="grid">
-
-<select id="tahun">
-  <option value="">Pilih Tahun</option>
-</select>
-
-<select id="bulan">
-  <option value="">Pilih Bulan</option>
-  <option value="01">Januari</option>
-  <option value="02">Februari</option>
-  <option value="03">Maret</option>
-  <option value="04">April</option>
-  <option value="05">Mei</option>
-  <option value="06">Juni</option>
-  <option value="07">Juli</option>
-  <option value="08">Agustus</option>
-  <option value="09">September</option>
-  <option value="10">Oktober</option>
-  <option value="11">November</option>
-  <option value="12">Desember</option>
-</select>
-
-<input type="file" id="pdfFiles" multiple accept="application/pdf">
-
-<button onclick="prosesUpload()">🚀 Proses Data</button>
-
+<div class="top-actions">
+  <button onclick="tambahBaris()">➕ Tambah Baris</button>
+  <button onclick="generateJSON()">🚀 Generate JSON</button>
+  <button onclick="copyJSON()">📋 Copy JSON</button>
 </div>
 
-<div class="file-list" id="fileList"></div>
+<table id="table">
+  <thead>
+    <tr>
+      <th>NIP</th>
+      <th>Nama File</th>
+      <th>Password</th>
+      <th>Aksi</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><input type="text" placeholder="NIP 18 digit"></td>
+      <td><input type="text" placeholder="Nama File PDF"></td>
+      <td><input type="text" placeholder="Password"></td>
+      <td><button class="btn-danger" onclick="hapusBaris(this)">❌</button></td>
+    </tr>
+  </tbody>
+</table>
 
-<h3>📄 JSON Output</h3>
-<pre class="preview" id="output"></pre>
-
-<div class="success" id="status"></div>
+<div class="output" id="output"></div>
 
 </div>
 
 <script>
-// AUTO TAHUN
-const tahunSelect = document.getElementById('tahun');
-const currentYear = new Date().getFullYear();
-
-for (let i = currentYear - 1; i <= currentYear + 2; i++) {
-  const opt = document.createElement('option');
-  opt.value = i;
-  opt.textContent = i;
-  tahunSelect.appendChild(opt);
-}
-tahunSelect.value = currentYear;
-
-// HASH PASSWORD
+// ================= HASH =================
 async function hashPassword(password) {
   const data = new TextEncoder().encode(password);
   const hash = await crypto.subtle.digest('SHA-256', data);
@@ -134,38 +124,44 @@ async function hashPassword(password) {
     .map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-// LIST FILE
-document.getElementById('pdfFiles').addEventListener('change', function() {
-  const list = [...this.files].map(f => f.name).join('<br>');
-  document.getElementById('fileList').innerHTML = "<b>File dipilih:</b><br>" + list;
-});
+// ================= TAMBAH BARIS =================
+function tambahBaris() {
+  const table = document.querySelector('#table tbody');
+  const row = document.createElement('tr');
 
-// PROSES
-async function prosesUpload() {
-  const tahun = document.getElementById('tahun').value;
-  const bulan = document.getElementById('bulan').value;
-  const files = document.getElementById('pdfFiles').files;
+  row.innerHTML = `
+    <td><input type="text" placeholder="NIP 18 digit"></td>
+    <td><input type="text" placeholder="Nama File PDF"></td>
+    <td><input type="text" placeholder="Password"></td>
+    <td><button class="btn-danger" onclick="hapusBaris(this)">❌</button></td>
+  `;
 
-  if (!tahun || !bulan || files.length === 0) {
-    alert("Lengkapi semua data!");
-    return;
-  }
+  table.appendChild(row);
+}
 
+// ================= HAPUS =================
+function hapusBaris(btn) {
+  btn.parentElement.parentElement.remove();
+}
+
+// ================= GENERATE JSON =================
+async function generateJSON() {
+  const rows = document.querySelectorAll('#table tbody tr');
   const data = {};
 
-  for (const file of files) {
-    const namaFile = file.name.replace('.pdf', '');
+  for (const row of rows) {
+    const inputs = row.querySelectorAll('input');
 
-    // Ambil NIP dari nama file (asumsi di awal nama)
-    const nipMatch = namaFile.match(/\d{18}/);
+    const nip = inputs[0].value.trim();
+    const namaFile = inputs[1].value.trim();
+    const password = inputs[2].value.trim();
 
-    if (!nipMatch) continue;
+    if (!nip || !namaFile || !password) continue;
 
-    const nip = nipMatch[0];
-
-    // password default: tanggal lahir dari NIP (YYYYMMDD → dibalik)
-    const tgl = nip.substring(6, 14);
-    const password = tgl.substring(6,8) + tgl.substring(4,6) + tgl.substring(0,4);
+    if (!/^\d{18}$/.test(nip)) {
+      alert("NIP harus 18 digit: " + nip);
+      return;
+    }
 
     const hashed = await hashPassword(password);
 
@@ -177,9 +173,13 @@ async function prosesUpload() {
 
   document.getElementById('output').textContent =
     JSON.stringify(data, null, 2);
+}
 
-  document.getElementById('status').innerHTML =
-    "✅ JSON siap! Upload PDF ke:<br><b>files/" + tahun + "/" + bulan + "/</b>";
+// ================= COPY =================
+function copyJSON() {
+  const text = document.getElementById('output').textContent;
+  navigator.clipboard.writeText(text);
+  alert('JSON berhasil disalin!');
 }
 </script>
 
