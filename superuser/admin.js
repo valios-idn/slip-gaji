@@ -1,17 +1,29 @@
 let adminData = null;
 
+// ================= INIT =================
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById('dashboard').classList.add('hidden');
+  document.getElementById('loginPage').classList.remove('hidden');
+
+  loadAdmin();
+
+  document.getElementById('loginForm')
+    .addEventListener('submit', (e) => {
+      e.preventDefault();
+      login();
+    });
+});
+
 // ================= LOAD ADMIN =================
 async function loadAdmin() {
   try {
-    const res = await fetch('superuser/admin.json');
+    const res = await fetch('admin.json');
 
-    if (!res.ok) {
-      throw new Error('admin.json tidak ditemukan');
-    }
+    if (!res.ok) throw new Error('admin.json tidak ditemukan');
 
     adminData = await res.json();
 
-    // cek auto login setelah data siap
+    // cek login
     if (localStorage.getItem('login') === 'true') {
       showDashboard();
     }
@@ -21,8 +33,6 @@ async function loadAdmin() {
     alert('Gagal load data admin!');
   }
 }
-
-loadAdmin();
 
 // ================= HASH =================
 async function hashPassword(password) {
@@ -36,9 +46,12 @@ async function hashPassword(password) {
 async function login() {
   const user = document.getElementById('username').value.trim();
   const pass = document.getElementById('password').value.trim();
+  const errorEl = document.getElementById('loginError');
+
+  errorEl.textContent = '';
 
   if (!adminData) {
-    alert('Data admin belum siap!');
+    errorEl.textContent = 'Data admin belum siap!';
     return;
   }
 
@@ -48,7 +61,7 @@ async function login() {
     localStorage.setItem('login', 'true');
     showDashboard();
   } else {
-    document.getElementById('loginError').textContent = 'Login gagal!';
+    errorEl.textContent = 'Username atau password salah!';
   }
 }
 
@@ -97,7 +110,6 @@ async function generateJSON() {
 
     if (!nip || !namaFile || !password) continue;
 
-    // validasi NIP
     if (!/^\d{18}$/.test(nip)) {
       alert("NIP harus 18 digit: " + nip);
       return;
