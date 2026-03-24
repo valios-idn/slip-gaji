@@ -98,7 +98,7 @@ form.addEventListener('submit', async function(e) {
     }
 
     viewerContainer.style.display = 'block';
-    pesan.textContent = `Slip Gaji ${namaFile} Berhasil Dimuat`;
+    pesan.textContent = `SLIP GAJI ${namaFile} BERHASIL DIMUAT`;
   } catch (err) {
     console.error(err);
     errorDiv.textContent = 'PDF tidak ditemukan / gagal dimuat!';
