@@ -20,14 +20,14 @@
   <h1>Slip Gaji Pegawai</h1>
 
   <form id="pdfForm">
-  <label>Tahun</label>
+  <label for="tahun">Tahun</label>
   <select id="tahun" required>
     <option value="">Pilih Tahun</option>
     <option value="2026">2026</option>
     <option value="2027">2027</option>
   </select>
 
-  <label>Bulan</label>
+  <label for="bulan">Bulan</label>
   <select id="bulan" required>
     <option value="">Pilih Bulan</option>
     <option value="01">Januari</option>
@@ -44,12 +44,11 @@
     <option value="12">Desember</option>
   </select>
 
-  <label>NIP / NI PPPK</label>
-  <input type="text" id="nip" placeholder="NIP / NI PPPK"
-       pattern="[0-9]+" inputmode="numeric" required>
-
-    <label>Password</label>
-<input type="password" id="password" placeholder="Masukkan Password" required>
+  <label for="nip">NIP / NI PPPK</label>
+  <input type="text" id="nip" required>
+    
+  <label for="password">Password</label>
+  <input type="password" id="password" required>
     
   <button type="submit">Tampilkan Slip Gaji</button>
 </form>
