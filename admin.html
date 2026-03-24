@@ -3,22 +3,49 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Generator JSON</title>
+<title>Admin Panel</title>
 
 <link rel="stylesheet" href="style-admin.css">
+<script defer src="admin.js"></script>
+
+<style>
+.login-box {
+  max-width: 400px;
+  margin: 80px auto;
+  background: white;
+  padding: 25px;
+  border-radius: 16px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+}
+
+.hidden {
+  display: none;
+}
+</style>
 
 </head>
 
 <body>
 
-<div class="container">
+<div id="loginPage" class="login-box">
+  <h2>🔐 Login Admin</h2>
 
-<h2>🔐 Generator JSON Pegawai</h2>
+  <input type="text" id="username" placeholder="Username"><br><br>
+  <input type="password" id="password" placeholder="Password"><br><br>
+
+  <button class="btn-primary" onclick="login()">Login</button>
+  <p id="loginError" style="color:red;"></p>
+</div>
+
+<div id="dashboard" class="container hidden">
+
+<h2>🧑‍💼 Generator JSON Pegawai</h2>
 
 <div class="top-actions">
   <button class="btn-primary" onclick="tambahBaris()">➕ Tambah</button>
   <button class="btn-success" onclick="generateJSON()">🚀 Generate</button>
   <button class="btn-copy" onclick="copyJSON()">📋 Copy</button>
+  <button class="btn-danger" onclick="logout()">🚪 Logout</button>
 </div>
 
 <div class="table-wrapper">
@@ -45,74 +72,6 @@
 <div class="output" id="output"></div>
 
 </div>
-
-<script>
-// HASH
-async function hashPassword(password) {
-  const data = new TextEncoder().encode(password);
-  const hash = await crypto.subtle.digest('SHA-256', data);
-  return Array.from(new Uint8Array(hash))
-    .map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-// TAMBAH
-function tambahBaris() {
-  const tbody = document.querySelector('#table tbody');
-  const tr = document.createElement('tr');
-
-  tr.innerHTML = `
-    <td><input type="text"></td>
-    <td><input type="text"></td>
-    <td><input type="text"></td>
-    <td><button class="btn-danger" onclick="hapusBaris(this)">❌</button></td>
-  `;
-
-  tbody.appendChild(tr);
-}
-
-// HAPUS
-function hapusBaris(btn) {
-  btn.closest('tr').remove();
-}
-
-// GENERATE
-async function generateJSON() {
-  const rows = document.querySelectorAll('#table tbody tr');
-  const data = {};
-
-  for (const row of rows) {
-    const inputs = row.querySelectorAll('input');
-
-    const nip = inputs[0].value.trim();
-    const namaFile = inputs[1].value.trim();
-    const password = inputs[2].value.trim();
-
-    if (!nip || !namaFile || !password) continue;
-
-    if (!/^\d{18}$/.test(nip)) {
-      alert("NIP harus 18 digit: " + nip);
-      return;
-    }
-
-    const hashed = await hashPassword(password);
-
-    data[nip] = {
-      namaFile: namaFile,
-      password: hashed
-    };
-  }
-
-  document.getElementById('output').textContent =
-    JSON.stringify(data, null, 2);
-}
-
-// COPY
-function copyJSON() {
-  const text = document.getElementById('output').textContent;
-  navigator.clipboard.writeText(text);
-  alert('JSON disalin!');
-}
-</script>
 
 </body>
 </html>
