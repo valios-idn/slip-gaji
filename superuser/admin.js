@@ -1,141 +1,160 @@
+// ==================== ADMIN PANEL JS ====================
+
 let adminData = null;
 
-// ================= INIT =================
+// ==================== INIT ====================
 document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById('dashboard').classList.add('hidden');
-  document.getElementById('loginPage').classList.remove('hidden');
+    // Reset tampilan awal
+    document.getElementById('dashboard').classList.add('hidden');
+    document.getElementById('loginPage').classList.remove('hidden');
 
-  loadAdmin();
+    // Load data admin & cek status login
+    loadAdmin();
 
-  document.getElementById('loginForm')
-    .addEventListener('submit', (e) => {
-      e.preventDefault();
-      login();
+    // Event Listener Login Form
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        login();
     });
 });
 
-// ================= LOAD ADMIN =================
+// ==================== LOAD ADMIN DATA ====================
 async function loadAdmin() {
-  try {
-    const res = await fetch('admin.json');
+    try {
+        const res = await fetch('admin.json');
+        if (!res.ok) throw new Error('File admin.json tidak ditemukan');
 
-    if (!res.ok) throw new Error('admin.json tidak ditemukan');
+        adminData = await res.json();
 
-    adminData = await res.json();
+        // Cek apakah sudah login sebelumnya
+        if (localStorage.getItem('isLoggedIn') === 'true') {
+            showDashboard();
+        }
+    } catch (err) {
+        console.error('Error loading admin data:', err);
+        alert('Gagal memuat data admin.\nPastikan file "admin.json" ada di folder yang sama.');
+    }
+}
 
-    // cek login
-    if (localStorage.getItem('login') === 'true') {
-      showDashboard();
+// ==================== HASH PASSWORD (SHA-256) ====================
+async function hashPassword(password) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// ==================== LOGIN ====================
+async function login() {
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const errorEl = document.getElementById('loginError');
+
+    errorEl.textContent = '';
+
+    if (!adminData) {
+        errorEl.textContent = 'Data admin belum siap. Silakan refresh halaman.';
+        return;
     }
 
-  } catch (err) {
-    console.error(err);
-    alert('Gagal load data admin!');
-  }
+    if (!username || !password) {
+        errorEl.textContent = 'Username dan password harus diisi!';
+        return;
+    }
+
+    const hashedInput = await hashPassword(password);
+
+    if (username === adminData.username && hashedInput === adminData.password) {
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('adminUsername', username);
+        showDashboard();
+    } else {
+        errorEl.textContent = '❌ Username atau password salah!';
+    }
 }
 
-// ================= HASH =================
-async function hashPassword(password) {
-  const data = new TextEncoder().encode(password);
-  const hash = await crypto.subtle.digest('SHA-256', data);
-  return Array.from(new Uint8Array(hash))
-    .map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-// ================= LOGIN =================
-async function login() {
-  const user = document.getElementById('username').value.trim();
-  const pass = document.getElementById('password').value.trim();
-  const errorEl = document.getElementById('loginError');
-
-  errorEl.textContent = '';
-
-  if (!adminData) {
-    errorEl.textContent = 'Data admin belum siap!';
-    return;
-  }
-
-  const hashed = await hashPassword(pass);
-
-  if (user === adminData.username && hashed === adminData.password) {
-    localStorage.setItem('login', 'true');
-    showDashboard();
-  } else {
-    errorEl.textContent = 'Username atau password salah!';
-  }
-}
-
-// ================= SHOW DASHBOARD =================
+// ==================== SHOW / HIDE ====================
 function showDashboard() {
-  document.getElementById('loginPage').classList.add('hidden');
-  document.getElementById('dashboard').classList.remove('hidden');
+    document.getElementById('loginPage').classList.add('hidden');
+    document.getElementById('dashboard').classList.remove('hidden');
 }
 
-// ================= LOGOUT =================
+// ==================== LOGOUT ====================
 function logout() {
-  localStorage.removeItem('login');
-  location.reload();
+    if (confirm('Yakin ingin logout?')) {
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('adminUsername');
+        location.reload();
+    }
 }
 
-// ================= TABLE =================
+// ==================== TABLE FUNCTIONS ====================
 function tambahBaris() {
-  const tbody = document.querySelector('#table tbody');
-  const tr = document.createElement('tr');
-
-  tr.innerHTML = `
-    <td><input type="text" placeholder="NIP"></td>
-    <td><input type="text" placeholder="Nama File"></td>
-    <td><input type="text" placeholder="Password"></td>
-    <td><button class="btn-danger" onclick="hapusBaris(this)">❌</button></td>
-  `;
-
-  tbody.appendChild(tr);
+    const tbody = document.querySelector('#table tbody');
+    const tr = document.createElement('tr');
+    
+    tr.innerHTML = `
+        <td><input type="text" placeholder="NIP" maxlength="18"></td>
+        <td><input type="text" placeholder="Nama File"></td>
+        <td><input type="text" placeholder="Password"></td>
+        <td><button class="btn-danger" onclick="hapusBaris(this)">❌</button></td>
+    `;
+    
+    tbody.appendChild(tr);
 }
 
 function hapusBaris(btn) {
-  btn.closest('tr').remove();
+    if (confirm('Hapus baris ini?')) {
+        btn.closest('tr').remove();
+    }
 }
 
-// ================= GENERATE JSON =================
+// ==================== GENERATE JSON ====================
 async function generateJSON() {
-  const rows = document.querySelectorAll('#table tbody tr');
-  const data = {};
+    const rows = document.querySelectorAll('#table tbody tr');
+    const data = {};
 
-  for (const row of rows) {
-    const inputs = row.querySelectorAll('input');
+    for (const row of rows) {
+        const inputs = row.querySelectorAll('input');
+        const nip = inputs[0].value.trim();
+        const namaFile = inputs[1].value.trim();
+        const password = inputs[2].value.trim();
 
-    const nip = inputs[0].value.trim();
-    const namaFile = inputs[1].value.trim();
-    const password = inputs[2].value.trim();
+        if (!nip || !namaFile || !password) continue;
 
-    if (!nip || !namaFile || !password) continue;
+        if (!/^\d{18}$/.test(nip)) {
+            alert(`NIP harus 18 digit angka!\nSalah: ${nip}`);
+            return;
+        }
 
-    if (!/^\d{18}$/.test(nip)) {
-      alert("NIP harus 18 digit: " + nip);
-      return;
+        const hashed = await hashPassword(password);
+
+        data[nip] = {
+            namaFile: namaFile,
+            password: hashed
+        };
     }
 
-    const hashed = await hashPassword(password);
+    if (Object.keys(data).length === 0) {
+        alert('Tambahkan minimal 1 data pegawai sebelum generate!');
+        return;
+    }
 
-    data[nip] = {
-      namaFile: namaFile,
-      password: hashed
-    };
-  }
-
-  document.getElementById('output').textContent =
-    JSON.stringify(data, null, 2);
+    document.getElementById('output').textContent = JSON.stringify(data, null, 2);
 }
 
-// ================= COPY =================
+// ==================== COPY JSON ====================
 function copyJSON() {
-  const text = document.getElementById('output').textContent;
+    const outputEl = document.getElementById('output');
+    const text = outputEl.textContent.trim();
 
-  if (!text) {
-    alert('Belum ada data!');
-    return;
-  }
+    if (!text || text === '{}') {
+        alert('Belum ada data JSON yang di-generate!');
+        return;
+    }
 
-  navigator.clipboard.writeText(text);
-  alert('JSON berhasil disalin!');
+    navigator.clipboard.writeText(text)
+        .then(() => alert('✅ JSON berhasil disalin ke clipboard!'))
+        .catch(() => alert('Gagal menyalin. Silakan copy manual dari kotak di bawah.'));
 }
