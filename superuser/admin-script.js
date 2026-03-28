@@ -122,27 +122,29 @@ function resetUpload() {
     if (statusEl) statusEl.innerText = "";
 }
 
-// ================= DASHBOARD - DAFTAR FILE =================
+// ================= DASHBOARD - DAFTAR FILE PER BULAN =================
+let currentFiles = []; // untuk fitur pencarian
+
 async function loadFilesByMonth() {
     const container = document.getElementById("filesList");
+    const searchContainer = document.getElementById("searchContainer");
     const tahun = document.getElementById("dashTahun").value;
     const bulan = document.getElementById("dashBulan").value;
     const tokenInput = document.getElementById("tokenDashboard").value.trim();
 
-    // Update global token jika diisi
     if (tokenInput) GLOBAL_GITHUB_TOKEN = tokenInput;
 
     if (!tahun || !bulan) {
-        container.innerHTML = `<p style="color:red;">⚠️ Pilih tahun dan bulan terlebih dahulu.</p>`;
+        container.innerHTML = `<p style="color:red; text-align:center; padding:40px;">⚠️ Pilih tahun dan bulan terlebih dahulu.</p>`;
         return;
     }
 
     if (!GLOBAL_GITHUB_TOKEN) {
-        container.innerHTML = `<p style="color:red;">⚠️ Token GitHub belum diisi.</p>`;
+        container.innerHTML = `<p style="color:red; text-align:center; padding:40px;">⚠️ Token GitHub belum diisi.</p>`;
         return;
     }
 
-    container.innerHTML = `<p style="color:#888; text-align:center;">⏳ Memuat daftar file...</p>`;
+    container.innerHTML = `<p style="color:#0066cc; text-align:center; padding:50px;">⏳ Sedang memuat daftar file...</p>`;
 
     const folderPath = `files/${tahun}/${bulan}`;
 
@@ -157,9 +159,10 @@ async function loadFilesByMonth() {
         });
 
         if (res.status === 404) {
-            container.innerHTML = `<p style="color:#888; text-align:center; padding:30px;">
-                ❌ Tidak ada file slip gaji untuk bulan ${getMonthName(bulan)} ${tahun}
+            container.innerHTML = `<p style="color:#888; text-align:center; padding:50px;">
+                ❌ Belum ada slip gaji untuk bulan ${getMonthName(bulan)} ${tahun}
             </p>`;
+            searchContainer.style.display = "none";
             return;
         }
 
@@ -167,51 +170,71 @@ async function loadFilesByMonth() {
 
         const filesData = await res.json();
 
-        const pdfFiles = filesData.filter(file => 
+        currentFiles = filesData.filter(file => 
             file.type === "file" && file.name.toUpperCase().endsWith(".PDF")
         );
 
-        if (pdfFiles.length === 0) {
-            container.innerHTML = `<p style="color:#888;">Tidak ada file PDF di folder ini.</p>`;
+        if (currentFiles.length === 0) {
+            container.innerHTML = `<p style="color:#888; text-align:center; padding:40px;">Tidak ada file PDF di folder ini.</p>`;
+            searchContainer.style.display = "none";
             return;
         }
 
-        pdfFiles.sort((a, b) => a.name.localeCompare(b.name));
+        // Tampilkan search box
+        searchContainer.style.display = "block";
 
-        let html = `<p style="margin-bottom:12px; color:#0066cc;">
-            📄 ${pdfFiles.length} file ditemukan — ${getMonthName(bulan)} ${tahun}
-        </p>`;
-
-        html += `<div style="max-height:480px; overflow-y:auto;">`;
-        pdfFiles.forEach(file => {
-            html += `
-                <div style="padding:11px 12px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;">
-                    <div style="flex:1;"><strong>${file.name}</strong></div>
-                    <div style="font-size:0.85em; color:#555;">${formatFileSize(file.size)}</div>
-                </div>`;
-        });
-        html += `</div>`;
-
-        container.innerHTML = html;
+        renderFileList(currentFiles);
 
     } catch (err) {
         console.error(err);
-        container.innerHTML = `<p style="color:red;">❌ Gagal memuat daftar file. Periksa token GitHub.</p>`;
+        container.innerHTML = `<p style="color:red; text-align:center; padding:40px;">
+            ❌ Gagal memuat daftar file. Pastikan token GitHub valid.
+        </p>`;
+        searchContainer.style.display = "none";
     }
 }
 
-function getMonthName(bulan) {
-    const months = {"01":"Januari","02":"Februari","03":"Maret","04":"April","05":"Mei","06":"Juni","07":"Juli","08":"Agustus","09":"September","10":"Oktober","11":"November","12":"Desember"};
-    return months[bulan] || bulan;
+// Fungsi untuk merender daftar file
+function renderFileList(fileList) {
+    const container = document.getElementById("filesList");
+    
+    let html = `<p style="margin-bottom:12px; color:#0066cc; font-weight:500;">
+        📄 ${fileList.length} file ditemukan
+    </p>`;
+
+    html += `<div style="max-height:520px; overflow-y:auto;">`;
+
+    fileList.forEach(file => {
+        html += `
+            <div class="file-item">
+                <div style="flex:1;">
+                    <strong>${file.name}</strong>
+                </div>
+                <div style="font-size:0.85em; color:#555; white-space:nowrap;">
+                    ${formatFileSize(file.size)}
+                </div>
+            </div>`;
+    });
+
+    html += `</div>`;
+    container.innerHTML = html;
 }
 
-function formatFileSize(bytes) {
-    if (!bytes) return "-";
-    if (bytes < 1024) return bytes + " B";
-    if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + " KB";
-    return (bytes/(1024*1024)).toFixed(1) + " MB";
-}
+// Fungsi pencarian file
+function searchFiles() {
+    const keyword = document.getElementById("fileSearchInput").value.toLowerCase().trim();
+    
+    if (!keyword) {
+        renderFileList(currentFiles);
+        return;
+    }
 
+    const filtered = currentFiles.filter(file => 
+        file.name.toLowerCase().includes(keyword)
+    );
+
+    renderFileList(filtered);
+}
 // ================= JSON GENERATOR =================
 async function generateJSON() {
     const file = excelFile.files[0];
@@ -422,6 +445,7 @@ window.uploadJSON = uploadJSON;
 window.uploadAll = uploadAll;
 window.removeFile = removeFile;
 window.loadFilesByMonth = loadFilesByMonth;
+window.searchFiles = searchFiles;
 
 // ================= START =================
 window.addEventListener("load", () => {
