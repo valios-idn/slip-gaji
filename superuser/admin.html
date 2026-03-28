@@ -211,7 +211,7 @@ async function uploadGitHub(){
   const token = document.getElementById("token").value;
   if(!token) return alert("Token kosong!");
 
-  const repo = "madhagaskar182/slip-gaji"; // ganti
+  const repo = "valios-idn/slip-gaji"; // ganti
   const path = "dataPegawai.json";
 
   const content = btoa(unescape(encodeURIComponent(JSON.stringify(dataResult,null,2))));
