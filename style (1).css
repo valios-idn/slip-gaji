@@ -1,0 +1,201 @@
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* BODY */
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #2563eb, #1e3a8a);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+}
+
+/* CARD */
+.card {
+  background: rgba(255,255,255,0.95);
+  padding: 30px;
+  border-radius: 18px;
+  width: 100%;
+  max-width: 750px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+  text-align: center;
+}
+
+/* LOGO */
+.logo {
+  width: 250px;
+  margin-bottom: 10px;
+}
+
+/* TITLE */
+h1 {
+  font-size: 28px;
+  margin-bottom: 20px;
+  color: #1e3a8a;
+}
+
+/* FORM */
+form {
+  text-align: left;
+}
+
+/* LABEL */
+label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 10px;
+  display: block;
+}
+
+/* SELECT */
+select {
+  font-size: 14px;
+  margin-top: 10px;
+  display: block;
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+/* INPUT */
+input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+/* BUTTON */
+button {
+  width: 100%;
+  margin-top: 15px;
+  padding: 12px;
+  border: none;
+  border-radius: 12px;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+  transition: 0.2s;
+}
+/* PASSWORD BOX */
+.password-box {
+  position: relative;
+}
+
+.password-box input {
+  width: 100%;
+  padding-right: 40px;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #666;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+
+/* ERROR */
+.error {
+  color: red;
+  font-size: 13px;
+}
+
+/* SUCCESS */
+#pesan {
+  color: green;
+  font-size: 13px;
+}
+
+/* ================= PDF VIEWER (IMPROVED) ================= */
+#viewerContainer {
+  margin-top: 20px;
+  background: #f1f5f9;
+  padding: 15px;
+  border-radius: 12px;
+
+  max-height: 500px;        /* batas tinggi */
+  overflow-y: auto;         /* scroll jika panjang */
+}
+
+/* biar PDF lebih tajam & proporsional */
+#pdfViewer canvas {
+  width: 100%;
+  height: auto;
+  margin-bottom: 10px;
+  border-radius: 6px;
+}
+
+/* SCROLLBAR (opsional biar cakep di PC) */
+#viewerContainer::-webkit-scrollbar {
+  width: 8px;
+}
+
+#viewerContainer::-webkit-scrollbar-thumb {
+  background: #cbd5f5;
+  border-radius: 10px;
+}
+
+/* ================= FOOTER ================= */
+.footer-text {
+  font-size: 14px;
+  text-align: center;
+  padding: 20px 0;
+  margin-top: 30px;
+  border-top: 1px solid rgba(200, 200, 200, 0.3);
+  color: rgba(128, 128, 128, 0.65);
+  opacity: 0.7;
+  letter-spacing: 0.3px;
+}
+
+/* DOWNLOAD */
+.download-btn {
+  display: block;
+  margin-top: 10px;
+  padding: 10px;
+  background: green;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+}
+
+/* HIDDEN */
+.hidden {
+  display: none;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 550px) {
+  .card {
+    padding: 20px;
+  }
+
+  h1 {
+    font-size: 22px;
+  }
+
+  .logo {
+    width: 180px;
+  }
+
+  .footer-text {
+    font-size: 12px;
+  }
+
+  #viewerContainer {
+    max-height: 400px;
+  }
+}
