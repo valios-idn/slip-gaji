@@ -55,8 +55,8 @@ label {
 /* SELECT */
 select {
   font-size: 14px;
-  font-weight: 600;
   margin-top: 10px;
+  display: block;
   width: 100%;
   padding: 10px;
   border-radius: 10px;
