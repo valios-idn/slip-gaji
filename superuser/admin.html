@@ -404,44 +404,64 @@ async function uploadJSON(){
     return;
   }
 
+  const status = document.getElementById("status") || {};
+  if(status) status.innerText = "⏳ Upload ke GitHub...";
+
+  const repo = "valios-idn/slip-gaji";
+  const path = "dataPegawai.json";
+
   const content = btoa(unescape(encodeURIComponent(JSON.stringify(jsonData,null,2))));
-  const url = "https://api.github.com/repos/valios-idn/slip-gaji/contents/dataPegawai.json";
+  const url = `https://api.github.com/repos/${repo}/contents/${path}`;
 
   try{
 
     let sha = null;
 
-    // 🔥 CEK FILE EXIST
+    // ================= CEK FILE =================
     const get = await fetch(url,{
-      headers:{ Authorization:`Bearer ${token}` }
+      headers:{
+        Authorization:`Bearer ${token}`,
+        Accept: "application/vnd.github+json"
+      }
     });
 
     if(get.ok){
       const data = await get.json();
       sha = data.sha;
+      console.log("File sudah ada, pakai SHA:", sha);
+    }else{
+      console.log("File belum ada, create baru");
     }
 
-    // 🔥 UPLOAD / UPDATE
+    // ================= UPLOAD =================
     const res = await fetch(url,{
       method:"PUT",
       headers:{
         Authorization:`Bearer ${token}`,
-        "Content-Type":"application/json"
+        "Content-Type":"application/json",
+        Accept: "application/vnd.github+json"
       },
-      body:JSON.stringify({
+      body: JSON.stringify({
         message:"update dataPegawai otomatis",
         content:content,
         sha:sha
       })
     });
 
-    if(!res.ok) throw new Error();
+    const result = await res.json();
+    console.log("RESULT:", result);
 
-    alert("✅ JSON berhasil diupload / diupdate!");
+    if(!res.ok){
+      throw new Error(result.message || "Upload gagal");
+    }
 
-  }catch(e){
-    console.error(e);
-    alert("❌ Upload JSON gagal!");
+    alert("✅ JSON berhasil diupload!");
+    if(status) status.innerText = "✅ Upload sukses";
+
+  }catch(err){
+    console.error("ERROR:", err);
+    alert("❌ Gagal upload:\n" + err.message);
+    if(status) status.innerText = "❌ Upload gagal";
   }
 }
 
