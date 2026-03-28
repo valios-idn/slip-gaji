@@ -121,7 +121,7 @@ form.addEventListener('submit', async function(e) {
 
   // ================= NAMA FILE CASE-INSENSITIVE =================
   const namaFileAsli = pegawai.namaFile;                    // Nama asli untuk tampilan & download
-  const namaFileUrl = namaFileAsli.toLowerCase();           // Nama untuk URL (case-insensitive)
+  const namaFileUrl = namaFileAsli.toUpperCase();           // Nama untuk URL (case-insensitive)
 
   currentFileName = namaFileAsli + '.pdf';
 
