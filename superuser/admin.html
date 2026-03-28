@@ -258,6 +258,20 @@ function showPage(p){
 }
 }
 
+// RESET
+function resetJSON(){
+  excelFile.value = "";
+  jsonOutput.value = "";
+  jsonFileList.innerHTML = "";
+  jsonData = {};
+}
+
+function resetUpload(){
+  pdfFiles.value = "";
+  fileList.innerHTML = "";
+  files = [];
+  status.innerText = "";
+}
 // TOKEN AUTO
 const TOKEN="_pat_11CAL3MIA03YlOdbk6DTFt_K7vkaYfLDFxgt5w5chcvjunGjaWA79oRknfplcB62Df4IBWLSBJw41Bw1j1";
 tokenJson.value=TOKEN;
