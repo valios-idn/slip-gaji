@@ -477,15 +477,6 @@ async function uploadJSON(){
       throw new Error(result.message || "Upload gagal");
     }
 
-    alert("✅ JSON berhasil diupload!");
-    if(status) status.innerText = "✅ Upload sukses";
-
-  }catch(err){
-    console.error("ERROR:", err);
-    alert("❌ Gagal upload:\n" + err.message);
-    if(status) status.innerText = "❌ Upload gagal";
-  }
-}
 
 /*  NOTIFIKASI */
 async function uploadAll(){
