@@ -85,6 +85,24 @@ button {
   cursor: pointer;
   transition: 0.2s;
 }
+/* PASSWORD BOX */
+.password-box {
+  position: relative;
+}
+
+.password-box input {
+  width: 100%;
+  padding-right: 40px;
+}
+
+.password-box span {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 18px;
+}
 
 button:hover {
   background: #1d4ed8;
