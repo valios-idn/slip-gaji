@@ -123,7 +123,7 @@ form.addEventListener('submit', async function(e) {
   const namaFile = pegawai.namaFile;
   currentFileName = namaFile + '.pdf';
 
-  const baseUrl = 'https://cdn.jsdelivr.net/gh/madhagaskar182/testing@main/files/';
+  const baseUrl = 'https://cdn.jsdelivr.net/gh/valios-idn/slip-gaji@main/files/';
   const url = `${baseUrl}${tahun}/${bulan}/${namaFile}.pdf`;
 
   try {
