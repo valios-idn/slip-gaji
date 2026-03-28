@@ -330,7 +330,7 @@ function showToast(message, type = "success") {
 
 // ================= DASHBOARD - DAFTAR FILE PER BULAN =================
 // Token khusus Dashboard (berbeda dari token Upload & JSON)
-const DASHBOARD_GITHUB_TOKEN = "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";  // ← GANTI DENGAN TOKEN KHUSUS DASHBOARD KAMU
+const DASHBOARD_GITHUB_TOKEN = "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";  // ← GANTI DENGAN TOKEN KHUSUS DASHBOARD KAMU
 
 const REPO_NAME = "valios-idn/slip-gaji";
 
