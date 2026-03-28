@@ -496,6 +496,7 @@ window.generateJSON = generateJSON;
 window.uploadJSON = uploadJSON;
 window.uploadAll = uploadAll;
 window.removeFile = removeFile;
+window.loadFilesByMonth = loadFilesByMonth;
 
 // ================= START APP =================
 window.addEventListener("load", () => {
