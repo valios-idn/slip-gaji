@@ -1,4 +1,4 @@
-// LOGIN
+// ================= LOGIN =================
 const ADMIN_HASH="eb8dd3569264665279b7715826fcf2a291b074137704e18d06574f321fd91a58";
 
 async function hash(t){
@@ -14,11 +14,10 @@ async function login(){
   } else alert("Salah!");
 }
 
-// NAV
+// ================= NAVIGATION =================
 let currentPage = "dashboard";
 
 function showPage(p){
-
   if(currentPage === "json") resetJSON();
   if(currentPage === "upload") resetUpload();
 
@@ -33,7 +32,7 @@ function showPage(p){
   currentPage = p;
 }
 
-// RESET
+// ================= RESET =================
 function resetJSON(){
   excelFile.value = "";
   jsonOutput.value = "";
@@ -47,12 +46,13 @@ function resetUpload(){
   files = [];
   status.innerText = "";
 }
-// TOKEN AUTO
+
+// ================= TOKEN DEFAULT =================
 const TOKEN="_pat_11CAL3MIA03YlOdbk6DTFt_K7vkaYfLDFxgt5w5chcvjunGjaWA79oRknfplcB62Df4IBWLSBJw41Bw1j1";
 tokenJson.value=TOKEN;
 tokenUpload.value=TOKEN;
 
-// DRAG JSON
+// ================= DRAG & DROP JSON =================
 excelDrop.onclick=()=>excelFile.click();
 excelDrop.ondrop=e=>{
   e.preventDefault();
@@ -68,7 +68,7 @@ function showExcel(){
   jsonFileList.innerHTML=`<div class="file-item">${f.name} <span class="remove" onclick="excelFile.value='';jsonFileList.innerHTML=''">✖</span></div>`;
 }
 
-// ================= HASH PASSWORD =================
+// ================= HASH =================
 async function hashPass(password) {
   const encoder = new TextEncoder();
   const data = encoder.encode(password);
@@ -79,234 +79,89 @@ async function hashPass(password) {
     .map(b => b.toString(16).padStart(2, "0"))
     .join("");
 }
-  
-// JSON GENERATE
-// ================= JSON GENERATE =================
+
+// ================= JSON GENERATOR =================
+let jsonData={};
+
 async function generateJSON(){
-
   const file = excelFile.files[0];
-
-  if(!file){
-    alert("⚠️ Pilih file Excel dulu!");
-    return;
-  }
-
-  console.log("FILE:", file.name, file.type);
+  if(!file){ alert("⚠️ Pilih file Excel dulu!"); return; }
 
   const reader = new FileReader();
 
   reader.onload = async function(e){
     try{
-
       const data = new Uint8Array(e.target.result);
-
-      // 🔥 READ EXCEL (MODE PALING AMAN)
-      const workbook = XLSX.read(data, {
-        type: "array",
-        cellDates: true,
-        cellText: false
-      });
-
-      console.log("SheetNames:", workbook.SheetNames);
-
+      const workbook = XLSX.read(data, {type: "array", cellDates: true, cellText: false});
       const sheetName = workbook.SheetNames[0];
-
-      if(!sheetName){
-        alert("❌ Sheet tidak ditemukan!");
-        return;
-      }
+      if(!sheetName){ alert("❌ Sheet tidak ditemukan!"); return; }
 
       const sheet = workbook.Sheets[sheetName];
+      const rows = XLSX.utils.sheet_to_json(sheet, {defval:"", raw:false});
 
-      // 🔥 RAW DATA (LEBIH AMAN)
-      const rows = XLSX.utils.sheet_to_json(sheet, {
-        defval: "",
-        raw: false
-      });
-
-      console.log("ROWS:", rows);
-
-      if(!rows || rows.length === 0){
-        alert("⚠️ File terbaca tapi kosong / header salah!");
-        return;
-      }
-
-      let result = {};
-
+      let result={};
       for(let row of rows){
+        const normalized={};
+        for(let key in row) normalized[key.toLowerCase().replace(/\s/g,'')]=row[key];
 
-        // 🔥 NORMALISASI HEADER (ANTI SPASI / CASE)
-        const normalized = {};
-        for(let key in row){
-          const cleanKey = key.toLowerCase().replace(/\s/g,'');
-          normalized[cleanKey] = row[key];
-        }
+        const email=(normalized.email||"").toLowerCase().trim();
+        const nama=(normalized.namafile||"").toUpperCase().trim();
+        const pass=(normalized.password||"").toString().trim();
 
-        const email = (normalized.email || "").toLowerCase().trim();
-        const nama  = (normalized.namafile || "").toUpperCase().trim();
-        const pass  = (normalized.password || "").toString().trim();
-
-        if(!email || !nama || !pass){
-          console.warn("SKIP ROW:", row);
-          continue;
-        }
-
-        result[email] = {
-          namaFile: nama,
-          password: await hashPass(pass)
-        };
+        if(!email || !nama || !pass) continue;
+        result[email]={namaFile:nama, password: await hashPass(pass)};
       }
 
-      if(Object.keys(result).length === 0){
-        alert("❌ Data tidak terbaca!\n\nCek:\n- Nama kolom\n- Isi tidak kosong");
+      if(Object.keys(result).length===0){
+        alert("❌ Data tidak terbaca! Cek kolom dan isinya.");
         return;
       }
 
-      jsonData = result;
-      jsonOutput.value = JSON.stringify(result, null, 2);
-
+      jsonData=result;
+      jsonOutput.value=JSON.stringify(result,null,2);
       alert("✅ JSON berhasil dibuat!");
-
     }catch(err){
       console.error("ERROR DETAIL:", err);
-
-      alert(
-        "❌ Gagal membaca Excel!\n\n" +
-        "Kemungkinan:\n" +
-        "1. File bukan .xlsx\n" +
-        "2. File rusak\n" +
-        "3. Format aneh (merge cell)\n\n" +
-        "Buka Console (F12) untuk detail"
-      );
+      alert("❌ Gagal membaca Excel! Periksa file.");
     }
-  };
-
-  reader.onerror = function(){
-    alert("❌ FileReader gagal membaca file!");
   };
 
   reader.readAsArrayBuffer(file);
 }
-// UPLOAD JSON
+
+// ================= UPLOAD JSON =================
 async function uploadJSON(){
-
-  if(Object.keys(jsonData).length === 0){
-    alert("⚠️ Generate JSON dulu!");
-    return;
-  }
-
+  if(Object.keys(jsonData).length===0){ alert("⚠️ Generate JSON dulu!"); return; }
   const token = tokenJson.value;
-
-  if(!token){
-    alert("⚠️ Token kosong!");
-    return;
-  }
+  if(!token){ alert("⚠️ Token kosong!"); return; }
 
   const status = document.getElementById("status") || {};
   if(status) status.innerText = "⏳ Upload ke GitHub...";
 
-  const repo = "valios-idn/slip-gaji";
-  const path = "dataPegawai.json";
+  const repo="valios-idn/slip-gaji";
+  const path="dataPegawai.json";
+  const content=btoa(unescape(encodeURIComponent(JSON.stringify(jsonData,null,2))));
+  const url=`https://api.github.com/repos/${repo}/contents/${path}`;
 
-  const content = btoa(unescape(encodeURIComponent(JSON.stringify(jsonData,null,2))));
-  const url = `https://api.github.com/repos/${repo}/contents/${path}`;
+  let sha=null;
 
-  try{
+  const get = await fetch(url,{headers:{Authorization:`Bearer ${token}`, Accept: "application/vnd.github+json"}});
+  if(get.ok){ const data=await get.json(); sha=data.sha; }
 
-    let sha = null;
+  const res=await fetch(url,{
+    method:"PUT",
+    headers:{Authorization:`Bearer ${token}`, "Content-Type":"application/json", Accept:"application/vnd.github+json"},
+    body: JSON.stringify({message:"update dataPegawai otomatis", content:content, sha:sha})
+  });
 
-    // ================= CEK FILE =================
-    const get = await fetch(url,{
-      headers:{
-        Authorization:`Bearer ${token}`,
-        Accept: "application/vnd.github+json"
-      }
-    });
-
-    if(get.ok){
-      const data = await get.json();
-      sha = data.sha;
-      console.log("File sudah ada, pakai SHA:", sha);
-    }else{
-      console.log("File belum ada, create baru");
-    }
-
-    // ================= UPLOAD =================
-    const res = await fetch(url,{
-      method:"PUT",
-      headers:{
-        Authorization:`Bearer ${token}`,
-        "Content-Type":"application/json",
-        Accept: "application/vnd.github+json"
-      },
-      body: JSON.stringify({
-        message:"update dataPegawai otomatis",
-        content:content,
-        sha:sha
-      })
-    });
-
-    const result = await res.json();
-    console.log("RESULT:", result);
-
-    if(!res.ok){
-      throw new Error(result.message || "Upload gagal");
-    }
-
-
-/*  NOTIFIKASI */
-async function uploadAll(){
-
-  if(files.length === 0){
-    alert("⚠️ Tidak ada file!");
-    return;
-  }
-
-  const token = tokenUpload.value;
-
-  if(!token){
-    alert("⚠️ Token kosong!");
-    return;
-  }
-
-  status.innerText = "⏳ Upload sedang berjalan...";
-
-  let success = 0;
-
-  for(let i=0;i<files.length;i++){
-    try{
-      await uploadSingle(files[i], i, token);
-      success++;
-    }catch(e){
-      console.error(e);
-    }
-  }
-
-function showToast(message, type="success"){
-  const toast = document.getElementById("toast");
-
-  toast.textContent = message;
-  toast.className = "toast show";
-
-  if(type === "error"){
-    toast.classList.add("error");
-  }
-
-  setTimeout(()=>{
-    toast.classList.remove("show");
-  }, 3000); // hilang otomatis 3 detik
+  const result=await res.json();
+  if(!res.ok) alert("❌ Upload gagal: "+(result.message||""));
+  else showToast("✅ JSON berhasil diupload!");
 }
-  // ================= NOTIF FINAL =================
-  if(success === files.length){
-  status.innerText = "🎉 Semua file berhasil diupload!";
-  alert("🎉 Upload selesai semua!");
-}else{
-  status.innerText = `⚠️ ${success}/${files.length} file berhasil`;
-  alert("⚠️ Ada file yang gagal upload");
-  }
 
-// PDF
-let files=[]; 
+// ================= UPLOAD PDF =================
+let files=[];
+
 pdfDrop.onclick=()=>pdfFiles.click();
 pdfFiles.onchange=e=>{files=Array.from(e.target.files);renderFiles();};
 
@@ -323,50 +178,55 @@ function renderFiles(){
 
 function removeFile(i){files.splice(i,1);renderFiles();}
 
-// UPLOAD PDF
-async function uploadSingle(file, i, token){
+async function uploadSingle(file,i,token){
+  const bar=document.getElementById("bar"+i);
+  const base64=await toBase64(file);
+  bar.style.width="30%";
 
-  const bar = document.getElementById("bar"+i);
+  const path=`files/${tahun.value}/${bulan.value}/${file.name}`;
+  const url=`https://api.github.com/repos/valios-idn/slip-gaji/contents/${path}`;
+  bar.style.width="60%";
 
-  const base64 = await toBase64(file);
-
-  bar.style.width = "30%";
-
-  // Ubah nama file menjadi huruf kapital
-  const fileName = file.name.toUpperCase();
-
-  const path = `files/${tahun.value}/${bulan.value}/${fileName}`;
-  const url = `https://api.github.com/repos/valios-idn/slip-gaji/contents/${path}`;
-
-  bar.style.width = "60%";
-
-  const res = await fetch(url,{
+  const res=await fetch(url,{
     method:"PUT",
-    headers:{
-      Authorization:`Bearer ${token}`,
-      "Content-Type":"application/json"
-    },
-    body:JSON.stringify({
-      message:"upload slip",
-      content:base64
-    })
+    headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},
+    body: JSON.stringify({message:"upload slip", content:base64})
   });
 
   if(!res.ok) throw new Error();
-
-  bar.style.width = "100%";
+  bar.style.width="100%";
 }
 
-  if(!res.ok) throw new Error();
-
-  bar.style.width = "100%";
-}
-
-// BASE64
 function toBase64(file){
   return new Promise(r=>{
     const fr=new FileReader();
     fr.onload=()=>r(fr.result.split(',')[1]);
     fr.readAsDataURL(file);
   });
+}
+
+async function uploadAll(){
+  if(files.length===0){ alert("⚠️ Tidak ada file!"); return; }
+
+  const token = tokenUpload.value;
+  if(!token){ alert("⚠️ Token kosong!"); return; }
+
+  status.innerText="⏳ Upload sedang berjalan...";
+  let success=0;
+
+  for(let i=0;i<files.length;i++){
+    try{ await uploadSingle(files[i], i, token); success++; }catch(e){ console.error(e); }
+  }
+
+  if(success===files.length){ status.innerText="🎉 Semua file berhasil diupload!"; showToast("🎉 Upload selesai semua!"); }
+  else{ status.innerText=`⚠️ ${success}/${files.length} file berhasil`; showToast("⚠️ Ada file yang gagal upload","error"); }
+}
+
+// ================= TOAST =================
+function showToast(message,type="success"){
+  const toast=document.getElementById("toast");
+  toast.textContent=message;
+  toast.className="toast show";
+  if(type==="error") toast.classList.add("error");
+  setTimeout(()=>{ toast.classList.remove("show"); },3000);
 }
