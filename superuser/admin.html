@@ -11,7 +11,7 @@
 
 <div id="toast" class="toast"></div>
 
-<!-- LOGIN PAGE -->
+<!-- LOGIN -->
 <div class="login" id="loginPage">
     <div class="login-box">
         <h2>🔐 Admin Login</h2>
@@ -20,7 +20,7 @@
     </div>
 </div>
 
-<!-- MAIN APP -->
+<!-- APP -->
 <div class="wrapper hidden" id="app">
 
     <!-- SIDEBAR -->
@@ -28,62 +28,66 @@
         <h3>⚡ ADMIN PANEL</h3>
         <div class="menu" onclick="showPage('dashboard')">🏠 Dashboard</div>
         <div class="menu" onclick="showPage('json')">📊 JSON Generator</div>
-        <div class="menu" onclick="showPage('upload')">📤 Upload Slip Gaji</div>
-        
-        <button id="btnLogout" style="background:#FF5F1F; color:#121212; margin-top:20px;">Logout</button>
+        <div class="menu" onclick="showPage('upload')">📤 Upload Slip</div>
+        <button id="btnLogout" style="background:red; color:white; margin-top:20px;">🚪 Logout</button>
     </div>
 
     <!-- CONTENT -->
     <div class="content">
 
         <!-- DASHBOARD -->
-<!-- DASHBOARD -->
-<div id="dashboardPage" class="card">
-    <h2>👋 Selamat Datang di Admin Dashboard</h2>
-    <p>Sistem Slip Gaji - Valios IDN</p>
+        <div id="dashboardPage" class="card">
+            <h2>👋 Selamat Datang di Admin Dashboard</h2>
+            <p>Sistem Slip Gaji - Valios IDN</p>
 
-    <div style="margin-top: 30px;">
-        <h3>📂 Daftar Slip Gaji yang Sudah Diupload</h3>
-        
-        <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-            <div>
-                <strong>Tahun:</strong><br>
-                <select id="dashTahun">
-                    <option value="2026">2026</option>
-                    <option value="2027">2027</option>
-                </select>
-            </div>
-            
-            <div>
-                <strong>Bulan:</strong><br>
-                <select id="dashBulan">
-                    <option value="01">Januari</option>
-                    <option value="02">Februari</option>
-                    <option value="03">Maret</option>
-                    <option value="04">April</option>
-                    <option value="05">Mei</option>
-                    <option value="06">Juni</option>
-                    <option value="07">Juli</option>
-                    <option value="08">Agustus</option>
-                    <option value="09">September</option>
-                    <option value="10">Oktober</option>
-                    <option value="11">November</option>
-                    <option value="12">Desember</option>
-                </select>
-            </div>
-            
-            <div style="align-self: flex-end;">
-                <button onclick="loadFilesByMonth()">🔍 Tampilkan Daftar</button>
+            <div style="margin-top: 30px;">
+                <h3>📂 Daftar Slip Gaji yang Sudah Diupload</h3>
+                
+                <div style="margin: 15px 0; padding: 15px; background: #f0f7ff; border-radius: 8px;">
+                    <strong>Token GitHub (digunakan untuk semua halaman):</strong><br>
+                    <input type="text" id="tokenDashboard" placeholder="Masukkan token GitHub di sini" style="width:100%; margin-top:8px;">
+                    <small style="color:#0066cc;">Token ini akan digunakan otomatis di JSON Generator dan Upload Slip</small>
+                </div>
+
+                <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                    <div>
+                        <strong>Tahun:</strong><br>
+                        <select id="dashTahun">
+                            <option value="2026">2026</option>
+                            <option value="2027">2027</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <strong>Bulan:</strong><br>
+                        <select id="dashBulan">
+                            <option value="01">Januari</option>
+                            <option value="02">Februari</option>
+                            <option value="03">Maret</option>
+                            <option value="04">April</option>
+                            <option value="05">Mei</option>
+                            <option value="06">Juni</option>
+                            <option value="07">Juli</option>
+                            <option value="08">Agustus</option>
+                            <option value="09">September</option>
+                            <option value="10">Oktober</option>
+                            <option value="11">November</option>
+                            <option value="12">Desember</option>
+                        </select>
+                    </div>
+                    
+                    <div style="align-self: flex-end;">
+                        <button onclick="loadFilesByMonth()">🔍 Tampilkan Daftar</button>
+                    </div>
+                </div>
+
+                <div id="filesList" class="recent-files" style="max-height: 550px; overflow-y: auto;">
+                    <p style="color:#888; text-align:center; padding:40px;">
+                        Masukkan Token GitHub, pilih Tahun dan Bulan, lalu klik "Tampilkan Daftar"
+                    </p>
+                </div>
             </div>
         </div>
-
-        <div id="filesList" class="recent-files" style="max-height: 550px; overflow-y: auto;">
-            <p style="color:#888; text-align:center; padding:40px;">
-                Pilih Tahun dan Bulan, lalu klik "Tampilkan Daftar"
-            </p>
-        </div>
-    </div>
-</div>
 
         <!-- JSON GENERATOR -->
         <div id="jsonPage" class="card hidden">
@@ -97,12 +101,6 @@
             <div id="jsonFileList"></div>
 
             <button onclick="generateJSON()">Generate JSON</button>
-
-            <div style="margin:15px 0;">
-                <strong>Token GitHub:</strong><br>
-                <input type="text" id="tokenJson" style="width:100%;">
-            </div>
-            
             <button onclick="uploadJSON()">Upload JSON ke GitHub</button>
 
             <textarea id="jsonOutput" placeholder="JSON akan muncul di sini..." rows="15"></textarea>
@@ -141,11 +139,6 @@
 
             <div id="fileList"></div>
 
-            <div style="margin:15px 0;">
-                <strong>Token GitHub:</strong><br>
-                <input type="text" id="tokenUpload" style="width:100%;">
-            </div>
-            
             <button onclick="uploadAll()">Upload Semua File</button>
 
             <div id="status"></div>
@@ -154,7 +147,6 @@
     </div>
 </div>
 
-<!-- SCRIPT -->
 <script src="admin-script.js"></script>
 </body>
 </html>
