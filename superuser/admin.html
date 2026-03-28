@@ -31,6 +31,7 @@ body {
   text-align: center;
 }
 
+/* INPUT & BUTTON */
 input, button {
   width: 100%;
   padding: 10px;
@@ -40,23 +41,39 @@ input, button {
 }
 
 button {
-  background: #3b82f6;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
   color: white;
   cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  transform: scale(1.03);
 }
 
 /* APP */
 .container {
   display: none;
   padding: 20px;
-  max-width: 900px;
-  margin: auto;
 }
 
 .card {
   background: #0f172a;
   padding: 20px;
   border-radius: 15px;
+  max-width: 700px;
+  margin: auto;
+}
+
+/* GRID */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.full {
+  grid-column: span 2;
 }
 
 /* DROP */
@@ -66,8 +83,15 @@ button {
   text-align: center;
   border-radius: 10px;
   cursor: pointer;
+  transition: 0.3s;
 }
 
+.drop-area:hover {
+  border-color: #3b82f6;
+  background: rgba(59,130,246,0.1);
+}
+
+/* OUTPUT */
 textarea {
   width: 100%;
   height: 250px;
@@ -75,6 +99,24 @@ textarea {
   background: #000;
   color: #22c55e;
   padding: 10px;
+  border-radius: 10px;
+}
+
+/* STATUS */
+.status {
+  margin-top: 10px;
+  font-size: 13px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .full {
+    grid-column: span 1;
+  }
 }
 </style>
 </head>
@@ -95,67 +137,72 @@ textarea {
   <div class="card">
     <h2>⚡ JSON Generator PRO</h2>
 
-    <div class="drop-area" id="dropArea">
-      <p>Drag & Drop Excel atau klik</p>
-      <input type="file" id="fileInput" hidden>
+    <div class="form-grid">
+
+      <!-- DROP -->
+      <div class="drop-area full" id="dropArea">
+        <p>📂 Drag & Drop Excel atau klik</p>
+        <input type="file" id="fileInput" hidden>
+      </div>
+
+      <!-- BUTTON -->
+      <button onclick="generate()">Generate JSON</button>
+      <button onclick="downloadJSON()">Download JSON</button>
+
+      <!-- BUTTON FULL -->
+      <button class="full" onclick="uploadGitHub()">Upload ke GitHub</button>
+
+      <!-- STATUS -->
+      <div class="status full" id="status"></div>
+
+      <!-- OUTPUT -->
+      <textarea class="full" id="output" placeholder="Hasil JSON akan muncul di sini..."></textarea>
+
     </div>
-
-    <button onclick="generate()">Generate JSON</button>
-    <button onclick="downloadJSON()">Download JSON</button>
-
-    <input type="password" id="token" placeholder="Masukkan Github Token">
-    <button onclick="uploadGitHub()">Upload ke GitHub</button>
-
-    <textarea id="output"></textarea>
   </div>
 </div>
 
 <script>
-// LOGIN (simple hash)
+// ================= LOGIN =================
+const ADMIN_HASH = "eb8dd3569264665279b7715826fcf2a291b074137704e18d06574f321fd91a58";
+
 async function hash(text){
   const enc = new TextEncoder().encode(text);
   const buf = await crypto.subtle.digest("SHA-256", enc);
   return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
 
-// GANTI HASH PASSWORD ADMIN DI SINI
-const ADMIN_HASH = "eb8dd3569264665279b7715826fcf2a291b074137704e18d06574f321fd91a58"; // contoh
-
 async function login(){
   const pass = document.getElementById("adminPass").value;
   const h = await hash(pass);
 
-  if(h.startsWith(ADMIN_HASH)){ // simple check
-    document.getElementById("loginPage").style.display="none";
-    document.getElementById("app").style.display="block";
-  }else{
+  if(h === ADMIN_HASH){
+    loginPage.style.display="none";
+    app.style.display="block";
+  } else {
     alert("Password salah!");
   }
 }
 
-// DRAG DROP
+// ================= DRAG DROP =================
 let fileGlobal = null;
-const drop = document.getElementById("dropArea");
-const input = document.getElementById("fileInput");
 
-drop.onclick = ()=>input.click();
+dropArea.onclick = () => fileInput.click();
 
-input.onchange = e=>{
+fileInput.onchange = e => {
   fileGlobal = e.target.files[0];
-  drop.innerText = fileGlobal.name;
+  dropArea.innerHTML = "📄 " + fileGlobal.name;
 };
 
-drop.ondragover = e=>{
-  e.preventDefault();
-};
+dropArea.ondragover = e => e.preventDefault();
 
-drop.ondrop = e=>{
+dropArea.ondrop = e => {
   e.preventDefault();
   fileGlobal = e.dataTransfer.files[0];
-  drop.innerText = fileGlobal.name;
+  dropArea.innerHTML = "📄 " + fileGlobal.name;
 };
 
-// HASH PASSWORD USER
+// ================= HASH PASSWORD =================
 async function hashPass(p){
   const enc = new TextEncoder().encode(p);
   const buf = await crypto.subtle.digest("SHA-256", enc);
@@ -164,13 +211,16 @@ async function hashPass(p){
 
 let dataResult = {};
 
-// GENERATE
+// ================= GENERATE =================
 async function generate(){
-  if(!fileGlobal){ alert("Upload file!"); return; }
+  if(!fileGlobal){
+    alert("Upload file dulu!");
+    return;
+  }
 
   const reader = new FileReader();
 
-  reader.onload = async e=>{
+  reader.onload = async e => {
     const wb = XLSX.read(new Uint8Array(e.target.result), {type:'array'});
     const sheet = wb.Sheets[wb.SheetNames[0]];
     const json = XLSX.utils.sheet_to_json(sheet);
@@ -178,27 +228,32 @@ async function generate(){
     let result = {};
 
     for(let r of json){
-      const email = (r.email||"").toLowerCase();
-      const nama = (r.namaFile||"").toUpperCase();
-      const pass = (r.password||"").toString();
+      const email = (r.email||"").toLowerCase().trim();
+      const nama = (r.namaFile||"").toUpperCase().trim();
+      const pass = (r.password||"").toString().trim();
 
-      if(!email||!nama||!pass) continue;
+      if(!email || !nama || !pass) continue;
 
-      result[email]={
-        namaFile:nama,
+      result[email] = {
+        namaFile: nama,
         password: await hashPass(pass)
       };
     }
 
     dataResult = result;
-    document.getElementById("output").value = JSON.stringify(result,null,2);
+    output.value = JSON.stringify(result, null, 2);
   };
 
   reader.readAsArrayBuffer(fileGlobal);
 }
 
-// DOWNLOAD
+// ================= DOWNLOAD =================
 function downloadJSON(){
+  if(Object.keys(dataResult).length === 0){
+    alert("Belum ada data!");
+    return;
+  }
+
   const blob = new Blob([JSON.stringify(dataResult,null,2)]);
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
@@ -206,40 +261,55 @@ function downloadJSON(){
   a.click();
 }
 
-// UPLOAD GITHUB
+// ================= UPLOAD GITHUB =================
 async function uploadGitHub(){
-  const token = document.getElementById("token").value;
-  if(!token) return alert("Token kosong!");
 
-  const repo = "valios-idn/slip-gaji"; // ganti
+  if(Object.keys(dataResult).length === 0){
+    alert("Generate data dulu!");
+    return;
+  }
+
+  status.textContent = "⏳ Uploading...";
+
+  const token = "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";
+  const repo = "valios-idn/slip-gaji";
   const path = "dataPegawai.json";
 
   const content = btoa(unescape(encodeURIComponent(JSON.stringify(dataResult,null,2))));
-
   const url = `https://api.github.com/repos/${repo}/contents/${path}`;
 
-  let sha=null;
+  try{
+    let sha = null;
 
-  const get = await fetch(url,{headers:{Authorization:`token ${token}`}});
-  if(get.ok){
-    const d=await get.json();
-    sha=d.sha;
+    const get = await fetch(url,{
+      headers:{ Authorization:`token ${token}` }
+    });
+
+    if(get.ok){
+      const d = await get.json();
+      sha = d.sha;
+    }
+
+    const res = await fetch(url,{
+      method:"PUT",
+      headers:{
+        Authorization:`token ${token}`,
+        "Content-Type":"application/json"
+      },
+      body: JSON.stringify({
+        message:"update dataPegawai otomatis",
+        content:content,
+        sha:sha
+      })
+    });
+
+    if(!res.ok) throw new Error();
+
+    status.textContent = "✅ Upload berhasil!";
+  }catch(err){
+    console.error(err);
+    status.textContent = "❌ Upload gagal!";
   }
-
-  await fetch(url,{
-    method:"PUT",
-    headers:{
-      Authorization:`token ${token}`,
-      "Content-Type":"application/json"
-    },
-    body:JSON.stringify({
-      message:"update data",
-      content:content,
-      sha:sha
-    })
-  });
-
-  alert("Upload berhasil!");
 }
 </script>
 
