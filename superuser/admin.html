@@ -270,6 +270,18 @@ function showExcel(){
   jsonFileList.innerHTML=`<div class="file-item">${f.name} <span class="remove" onclick="excelFile.value='';jsonFileList.innerHTML=''">✖</span></div>`;
 }
 
+// ================= HASH PASSWORD =================
+async function hashPass(password) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+
+  return Array.from(new Uint8Array(hashBuffer))
+    .map(b => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+  
 // JSON GENERATE
 // ================= JSON GENERATE =================
 async function generateJSON(){
