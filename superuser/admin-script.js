@@ -328,25 +328,30 @@ function showToast(message, type = "success") {
     setTimeout(() => toast.classList.remove("show"), 3000);
 }
 
-// ================= RECENT SEARCHES (EMAIL) DASHBOARD =================
-async function loadRecentSearches() {
-    const container = document.getElementById("recentSearchesList");
-    if (!container) return;
+// ================= DASHBOARD - DAFTAR FILE PER BULAN =================
+async function loadFilesByMonth() {
+    const container = document.getElementById("filesList");
+    const tahun = document.getElementById("dashTahun").value;
+    const bulan = document.getElementById("dashBulan").value;
 
-    container.innerHTML = `<p style="color:#888; text-align:center;">⏳ Memuat daftar email terbaru...</p>`;
-
-    const token = tokenUpload.value.trim() || tokenJson.value.trim();
-    if (!token) {
-        container.innerHTML = `<p style="color:red;">⚠️ Token GitHub belum diisi.</p>`;
+    if (!tahun || !bulan) {
+        container.innerHTML = `<p style="color:red;">Pilih tahun dan bulan terlebih dahulu.</p>`;
         return;
     }
 
-    try {
-        const repo = "valios-idn/slip-gaji";
-        const path = "recentSearches.json";
-        const url = `https://api.github.com/repos/${repo}/contents/${path}`;
+    container.innerHTML = `<p style="color:#888; text-align:center;">⏳ Memuat daftar file...</p>`;
 
-        // Ambil file recentSearches.json
+    const token = tokenUpload.value.trim() || tokenJson.value.trim();
+    if (!token) {
+        container.innerHTML = `<p style="color:red;">⚠️ Token GitHub belum diisi di bagian JSON Generator atau Upload Slip.</p>`;
+        return;
+    }
+
+    const folderPath = `files/${tahun}/${bulan}`;
+
+    try {
+        const url = `https://api.github.com/repos/valios-idn/slip-gaji/contents/${folderPath}`;
+
         const res = await fetch(url, {
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -354,57 +359,75 @@ async function loadRecentSearches() {
             }
         });
 
+        if (res.status === 404) {
+            container.innerHTML = `<p style="color:#888; text-align:center; padding:30px;">
+                ❌ Tidak ada file slip gaji untuk bulan ${getMonthName(bulan)} ${tahun}
+            </p>`;
+            return;
+        }
+
         if (!res.ok) {
-            if (res.status === 404) {
-                container.innerHTML = `<p style="color:#888;">Belum ada data pencarian. Data akan muncul setelah ada user yang mencari slip gaji.</p>`;
-            } else {
-                throw new Error("Gagal mengambil data");
-            }
+            throw new Error("Gagal mengambil daftar file");
+        }
+
+        const files = await res.json();
+
+        // Filter hanya file .PDF (case insensitive)
+        const pdfFiles = files.filter(file => 
+            file.type === "file" && 
+            file.name.toUpperCase().endsWith(".PDF")
+        );
+
+        if (pdfFiles.length === 0) {
+            container.innerHTML = `<p style="color:#888;">Tidak ada file PDF di folder ini.</p>`;
             return;
         }
 
-        const data = await res.json();
-        const content = JSON.parse(atob(data.content));
+        // Urutkan berdasarkan nama file
+        pdfFiles.sort((a, b) => a.name.localeCompare(b.name));
 
-        // content diasumsikan berupa array: [{email, timestamp}, ...] dengan index 0 = paling baru
-        let searches = Array.isArray(content) ? content : [];
+        let html = `<p style="margin-bottom:10px; color:#0066cc;">
+            <strong>${pdfFiles.length} file ditemukan</strong> - ${getMonthName(bulan)} ${tahun}
+        </p>`;
+        
+        html += `<div style="max-height:480px; overflow-y:auto;">`;
 
-        if (searches.length === 0) {
-            container.innerHTML = `<p style="color:#888;">Belum ada data pencarian.</p>`;
-            return;
-        }
-
-        // Ambil maksimal 20 terbaru
-        searches = searches.slice(0, 20);
-
-        let html = `<div style="max-height:500px; overflow-y:auto;">`;
-        searches.forEach(item => {
-            const date = new Date(item.timestamp).toLocaleString('id-ID', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-
+        pdfFiles.forEach(file => {
             html += `
-                <div style="padding:12px 10px; border-bottom:1px solid #ddd; display:flex; justify-content:space-between; align-items:center;">
-                    <div>
-                        <strong>${item.email}</strong>
+                <div class="file-item" style="padding:10px 12px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;">
+                    <div style="flex:1;">
+                        <strong>${file.name}</strong>
                     </div>
-                    <div style="text-align:right; font-size:0.9em; color:#666;">
-                        ${date}
+                    <div style="font-size:0.85em; color:#666;">
+                        ${formatFileSize(file.size)}
                     </div>
                 </div>`;
         });
-        html += `</div>`;
 
+        html += `</div>`;
         container.innerHTML = html;
 
     } catch (err) {
         console.error(err);
-        container.innerHTML = `<p style="color:red;">❌ Gagal memuat data. Pastikan token GitHub valid.</p>`;
+        container.innerHTML = `<p style="color:red;">❌ Gagal memuat daftar file. Pastikan token GitHub valid dan memiliki akses repo.</p>`;
     }
+}
+
+// Helper function
+function getMonthName(bulan) {
+    const months = {
+        "01": "Januari", "02": "Februari", "03": "Maret", "04": "April",
+        "05": "Mei", "06": "Juni", "07": "Juli", "08": "Agustus",
+        "09": "September", "10": "Oktober", "11": "November", "12": "Desember"
+    };
+    return months[bulan] || bulan;
+}
+
+function formatFileSize(bytes) {
+    if (!bytes) return "";
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+    return (bytes / (1024 * 1024)).toFixed(1) + " MB";
 }
 
 // ================= INIT & EVENT LISTENERS =================
@@ -473,7 +496,6 @@ window.generateJSON = generateJSON;
 window.uploadJSON = uploadJSON;
 window.uploadAll = uploadAll;
 window.removeFile = removeFile;
-window.loadRecentSearches = loadRecentSearches;
 
 // ================= START APP =================
 window.addEventListener("load", () => {
