@@ -183,6 +183,7 @@ async function uploadSingle(file,i,token){
   const base64=await toBase64(file);
   bar.style.width="30%";
 
+  const fileName = file.name.toUpperCase();
   const path=`files/${tahun.value}/${bulan.value}/${file.name}`;
   const url=`https://api.github.com/repos/valios-idn/slip-gaji/contents/${path}`;
   bar.style.width="60%";
