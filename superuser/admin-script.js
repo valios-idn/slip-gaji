@@ -123,28 +123,29 @@ function resetUpload() {
 }
 
 // ================= DASHBOARD - DAFTAR FILE PER BULAN =================
-let currentFiles = []; // untuk fitur pencarian
+let currentFiles = [];
 
 async function loadFilesByMonth() {
     const container = document.getElementById("filesList");
     const searchContainer = document.getElementById("searchContainer");
     const tahun = document.getElementById("dashTahun").value;
     const bulan = document.getElementById("dashBulan").value;
-    const tokenInput = document.getElementById("tokenDashboard").value.trim();
+    let token = document.getElementById("tokenDashboard").value.trim();
 
-    if (tokenInput) GLOBAL_GITHUB_TOKEN = tokenInput;
+    if (token) GLOBAL_GITHUB_TOKEN = token;
+    token = GLOBAL_GITHUB_TOKEN;
 
     if (!tahun || !bulan) {
         container.innerHTML = `<p style="color:red; text-align:center; padding:40px;">⚠️ Pilih tahun dan bulan terlebih dahulu.</p>`;
         return;
     }
 
-    if (!GLOBAL_GITHUB_TOKEN) {
+    if (!token) {
         container.innerHTML = `<p style="color:red; text-align:center; padding:40px;">⚠️ Token GitHub belum diisi.</p>`;
         return;
     }
 
-    container.innerHTML = `<p style="color:#0066cc; text-align:center; padding:50px;">⏳ Sedang memuat daftar file...</p>`;
+    container.innerHTML = `<p style="color:#0066cc; text-align:center; padding:50px;">⏳ Memuat daftar file dari GitHub...</p>`;
 
     const folderPath = `files/${tahun}/${bulan}`;
 
@@ -153,88 +154,80 @@ async function loadFilesByMonth() {
 
         const res = await fetch(url, {
             headers: {
-                Authorization: `Bearer ${GLOBAL_GITHUB_TOKEN}`,
-                Accept: "application/vnd.github+json"
+                Authorization: `Bearer ${token}`,
+                Accept: "application/vnd.github+json",
+                "User-Agent": "Admin-Dashboard"   // GitHub kadang butuh ini
             }
         });
 
+        const responseText = await res.text();  // ambil dulu teks untuk debug
+
         if (res.status === 404) {
-            container.innerHTML = `<p style="color:#888; text-align:center; padding:50px;">
-                ❌ Belum ada slip gaji untuk bulan ${getMonthName(bulan)} ${tahun}
+            // Bisa karena folder kosong / tidak ada, atau token tidak punya akses
+            try {
+                const errorData = JSON.parse(responseText);
+                if (errorData.message && errorData.message.includes("Bad credentials")) {
+                    container.innerHTML = `<p style="color:red; text-align:center; padding:40px;">
+                        ❌ Token tidak valid atau expired.<br>
+                        <small>Periksa apakah token masih aktif dan memiliki izin "Contents: Read".</small>
+                    </p>`;
+                } else {
+                    container.innerHTML = `<p style="color:#888; text-align:center; padding:50px;">
+                        ❌ Tidak ada slip gaji untuk bulan ${getMonthName(bulan)} ${tahun}<br>
+                        <small>Folder belum ada atau belum ada file yang diupload.</small>
+                    </p>`;
+                }
+            } catch (e) {
+                container.innerHTML = `<p style="color:#888; text-align:center; padding:50px;">
+                    ❌ Tidak ada file untuk bulan ${getMonthName(bulan)} ${tahun}
+                </p>`;
+            }
+            searchContainer.style.display = "none";
+            return;
+        }
+
+        if (!res.ok) {
+            let msg = "Gagal mengambil data";
+            try {
+                const err = JSON.parse(responseText);
+                msg = err.message || msg;
+            } catch (_) {}
+            
+            container.innerHTML = `<p style="color:red; text-align:center; padding:40px;">
+                ❌ Error: ${msg}<br>
+                <small>Status: ${res.status} - Periksa token dan izin repository.</small>
             </p>`;
             searchContainer.style.display = "none";
             return;
         }
 
-        if (!res.ok) throw new Error("Gagal mengambil data");
-
-        const filesData = await res.json();
+        const filesData = JSON.parse(responseText);
 
         currentFiles = filesData.filter(file => 
             file.type === "file" && file.name.toUpperCase().endsWith(".PDF")
         );
 
         if (currentFiles.length === 0) {
-            container.innerHTML = `<p style="color:#888; text-align:center; padding:40px;">Tidak ada file PDF di folder ini.</p>`;
+            container.innerHTML = `<p style="color:#888; text-align:center; padding:40px;">
+                Tidak ada file PDF di folder ${folderPath}
+            </p>`;
             searchContainer.style.display = "none";
             return;
         }
 
-        // Tampilkan search box
         searchContainer.style.display = "block";
-
         renderFileList(currentFiles);
 
     } catch (err) {
-        console.error(err);
+        console.error("Error loadFilesByMonth:", err);
         container.innerHTML = `<p style="color:red; text-align:center; padding:40px;">
-            ❌ Gagal memuat daftar file. Pastikan token GitHub valid.
+            ❌ Terjadi kesalahan koneksi ke GitHub.<br>
+            Pastikan token valid dan internet stabil.
         </p>`;
         searchContainer.style.display = "none";
     }
 }
 
-// Fungsi untuk merender daftar file
-function renderFileList(fileList) {
-    const container = document.getElementById("filesList");
-    
-    let html = `<p style="margin-bottom:12px; color:#0066cc; font-weight:500;">
-        📄 ${fileList.length} file ditemukan
-    </p>`;
-
-    html += `<div style="max-height:520px; overflow-y:auto;">`;
-
-    fileList.forEach(file => {
-        html += `
-            <div class="file-item">
-                <div style="flex:1;">
-                    <strong>${file.name}</strong>
-                </div>
-                <div style="font-size:0.85em; color:#555; white-space:nowrap;">
-                    ${formatFileSize(file.size)}
-                </div>
-            </div>`;
-    });
-
-    html += `</div>`;
-    container.innerHTML = html;
-}
-
-// Fungsi pencarian file
-function searchFiles() {
-    const keyword = document.getElementById("fileSearchInput").value.toLowerCase().trim();
-    
-    if (!keyword) {
-        renderFileList(currentFiles);
-        return;
-    }
-
-    const filtered = currentFiles.filter(file => 
-        file.name.toLowerCase().includes(keyword)
-    );
-
-    renderFileList(filtered);
-}
 // ================= JSON GENERATOR =================
 async function generateJSON() {
     const file = excelFile.files[0];
