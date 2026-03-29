@@ -1,0 +1,136 @@
+/* style.css */
+
+/* Body */
+body {
+    background-color: #f3f4f6;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Drag & Drop */
+.drag-over {
+    border: 2px dashed #3b82f6;
+    background-color: #eff6ff;
+}
+
+/* Toast Notification */
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #111;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 6px;
+    opacity: 0;
+    transform: translateX(50px);
+    transition: all 0.5s;
+    z-index: 1000;
+}
+.toast.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Login Panel */
+#loginPanel input {
+    border: 1px solid #d1d5db;
+    padding: 8px;
+    border-radius: 6px;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+#loginPanel button {
+    background-color: #2563eb;
+    color: #fff;
+    width: 100%;
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+#loginPanel button:hover {
+    background-color: #1e40af;
+}
+
+/* Sidebar */
+#adminPanel .menuBtn {
+    width: 100%;
+    padding: 12px 16px;
+    text-align: left;
+    cursor: pointer;
+}
+#adminPanel .menuBtn:hover {
+    background-color: #374151;
+}
+#logoutBtn {
+    width: 100%;
+    padding: 12px 16px;
+    text-align: left;
+    cursor: pointer;
+    border-top: 1px solid #374151;
+}
+#logoutBtn:hover {
+    background-color: #dc2626;
+}
+
+/* Drop zones */
+#dropZoneExcel, #dropZonePdf {
+    border: 2px dashed #9ca3af;
+    padding: 40px;
+    text-align: center;
+    border-radius: 8px;
+    cursor: pointer;
+}
+#dropZoneExcel:hover, #dropZonePdf:hover {
+    background-color: #eff6ff;
+}
+
+/* File list items */
+#uploadedFiles div, #pdfFilesList div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #e5e7eb;
+    padding: 8px;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+}
+
+/* Buttons */
+button {
+    border: none;
+    cursor: pointer;
+    border-radius: 6px;
+    padding: 8px 16px;
+    color: white;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+/* JSON preview */
+#jsonPreview {
+    background-color: #f3f4f6;
+    padding: 16px;
+    border-radius: 6px;
+    height: 16rem;
+    overflow: auto;
+}
+
+/* Loading bar */
+#pdfLoading {
+    width: 100%;
+    background-color: #d1d5db;
+    border-radius: 6px;
+    margin-top: 1rem;
+    display: none;
+}
+#pdfProgress {
+    background-color: #22c55e;
+    color: white;
+    text-align: center;
+    padding: 4px 0;
+    border-radius: 6px;
+    width: 0%;
+}
