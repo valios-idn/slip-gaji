@@ -1,148 +1,88 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard PRO+</title>
-    <link rel="stylesheet" href="admin-style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="admin-script.js" defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 </head>
-<body>
-
-<div id="toast" class="toast"></div>
-
-<!-- LOGIN -->
-<div class="login" id="loginPage">
-    <div class="login-box">
-        <h2>🔐 Admin Login</h2>
-        <input type="password" id="adminPass" placeholder="Masukkan password admin">
-        <button id="btnLogin">Login</button>
+<body class="bg-gray-100">
+  <!-- LOGIN PANEL -->
+  <div id="loginPanel" class="h-screen flex items-center justify-center">
+    <div class="bg-white shadow-xl rounded-lg p-8 w-96">
+      <h1 class="text-2xl font-bold mb-6 text-center">Admin Login</h1>
+      <input type="text" id="username" placeholder="Username" class="border p-2 w-full mb-4 rounded">
+      <input type="password" id="password" placeholder="Password" class="border p-2 w-full mb-4 rounded">
+      <button id="loginBtn" class="bg-blue-600 text-white w-full py-2 rounded hover:bg-blue-700">Login</button>
+      <p id="loginError" class="text-red-500 mt-2 hidden">Username atau password salah</p>
     </div>
-</div>
+  </div>
 
-<!-- APP -->
-<div class="wrapper hidden" id="app">
+  <!-- ADMIN DASHBOARD -->
+  <div id="adminPanel" class="hidden">
+    <div class="flex h-screen">
+      <!-- Sidebar -->
+      <div class="w-64 bg-gray-800 text-white flex flex-col">
+        <div class="text-center font-bold text-xl py-6 border-b border-gray-700">Admin Panel</div>
+        <ul class="flex-1">
+          <li><button class="w-full py-3 px-4 hover:bg-gray-700 text-left menuBtn" data-menu="dashboard">Dashboard</button></li>
+          <li><button class="w-full py-3 px-4 hover:bg-gray-700 text-left menuBtn" data-menu="generateJson">Generate JSON</button></li>
+          <li><button class="w-full py-3 px-4 hover:bg-gray-700 text-left menuBtn" data-menu="uploadPdf">Upload PDF</button></li>
+        </ul>
+        <button id="logoutBtn" class="w-full py-3 px-4 hover:bg-red-600 text-left border-t border-gray-700">Log Out</button>
+      </div>
 
-    <!-- SIDEBAR -->
-    <div class="sidebar">
-        <h3>⚡ ADMIN PANEL</h3>
-        <div class="menu" onclick="showPage('dashboard')">🏠 Dashboard</div>
-        <div class="menu" onclick="showPage('json')">📊 JSON Generator</div>
-        <div class="menu" onclick="showPage('upload')">📤 Upload Slip</div>
-        <button id="btnLogout" style="background:red; color:white; margin-top:20px;">🚪 Logout</button>
-    </div>
-
-    <!-- CONTENT -->
-    <div class="content">
-
-        <!-- DASHBOARD -->
-        <div id="dashboardPage" class="card">
-            <h2>👋 Selamat Datang di Admin Dashboard</h2>
-            <p>Sistem Manajemen Slip Gaji - Valios IDN</p>
-
-            <!-- Token GitHub -->
-            <div class="token-card" style="margin-top:20px;">
-                <strong>🔑 Token GitHub (digunakan di semua menu)</strong>
-                <input type="text" id="tokenDashboard" 
-                       placeholder="Masukkan token GitHub di sini" 
-                       style="width:100%; padding:10px; border-radius:6px; border:1px solid #ccc; margin-top:8px;">
-                <small style="color:#0066cc;">Token ini akan digunakan otomatis di JSON Generator dan Upload Slip Gaji</small>
-            </div>
-
-            <!-- Pilih Tahun & Bulan -->
-            <div class="filter-container" style="margin-top:20px; display:flex; gap:10px; align-items:center;">
-                <div class="filter-group">
-                    <label>Tahun</label>
-                    <select id="dashTahun">
-                        <option value="2026">2026</option>
-                        <option value="2027">2027</option>
-                    </select>
-                </div>
-
-                <div class="filter-group">
-                    <label>Bulan</label>
-                    <select id="dashBulan">
-                        <option value="01">Januari</option>
-                        <option value="02">Februari</option>
-                        <option value="03">Maret</option>
-                        <option value="04">April</option>
-                        <option value="05">Mei</option>
-                        <option value="06">Juni</option>
-                        <option value="07">Juli</option>
-                        <option value="08">Agustus</option>
-                        <option value="09">September</option>
-                        <option value="10">Oktober</option>
-                        <option value="11">November</option>
-                        <option value="12">Desember</option>
-                    </select>
-                </div>
-
-                <button id="btnShowFiles" class="btn-primary">🔍 Tampilkan Daftar File</button>
-            </div>
-
-            <!-- Hasil daftar file -->
-            <div id="filesList" class="files-result" style="margin-top:20px; padding:20px; border:1px solid #ddd; border-radius:6px;">
-                <p style="color:#888; text-align:center;">Masukkan token GitHub, pilih Tahun & Bulan, lalu klik tombol di atas</p>
-            </div>
+      <!-- Content -->
+      <div class="flex-1 p-6 overflow-auto">
+        <!-- Dashboard -->
+        <div id="dashboard" class="menuContent hidden">
+          <h2 class="text-2xl font-bold mb-4">Dashboard</h2>
+          <div class="mb-4">
+            <label>Tahun:</label>
+            <select id="selectYear" class="border p-2 rounded"></select>
+            <label>Bulan:</label>
+            <select id="selectMonth" class="border p-2 rounded"></select>
+          </div>
+          <div class="mb-4">
+            <label>GitHub Token:</label>
+            <input type="text" id="githubToken" class="border p-2 w-full rounded">
+          </div>
+          <button id="loadFiles" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Tampilkan File</button>
+          <ul id="fileList" class="mt-4 list-disc pl-5"></ul>
         </div>
 
-        <!-- JSON GENERATOR -->
-        <div id="jsonPage" class="card hidden">
-            <h2>📊 JSON Generator</h2>
-
-            <div class="drop-area" id="excelDrop">
-                📊 Drag & Drop File Excel / Klik untuk memilih
-                <input type="file" id="excelFile" accept=".xlsx,.xls" hidden>
-            </div>
-
-            <div id="jsonFileList"></div>
-
-            <button id="btnGenerateJSON">Generate JSON</button>
-            <button id="btnUploadJSON">Upload JSON ke GitHub</button>
-
-            <textarea id="jsonOutput" placeholder="JSON akan muncul di sini..." rows="15"></textarea>
+        <!-- Generate JSON -->
+        <div id="generateJson" class="menuContent hidden">
+          <h2 class="text-2xl font-bold mb-4">Generate JSON</h2>
+          <input type="file" id="excelInput" accept=".xlsx" multiple class="mb-4">
+          <div id="uploadedFiles" class="mb-4"></div>
+          <button id="generateJsonBtn" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Generate JSON</button>
+          <pre id="jsonPreview" class="bg-gray-100 p-4 mt-4 rounded overflow-auto h-64"></pre>
+          <button id="uploadJsonBtn" class="bg-purple-600 text-white px-4 py-2 rounded mt-4 hover:bg-purple-700">Upload JSON ke GitHub</button>
         </div>
 
-        <!-- UPLOAD SLIP -->
-        <div id="uploadPage" class="card hidden">
-            <h2>📤 Upload Slip Gaji</h2>
-
-            <div style="margin-bottom:15px;">
-                <select id="tahun">
-                    <option value="2026">2026</option>
-                    <option value="2027">2027</option>
-                </select>
-
-                <select id="bulan">
-                    <option value="01">Januari</option>
-                    <option value="02">Februari</option>
-                    <option value="03">Maret</option>
-                    <option value="04">April</option>
-                    <option value="05">Mei</option>
-                    <option value="06">Juni</option>
-                    <option value="07">Juli</option>
-                    <option value="08">Agustus</option>
-                    <option value="09">September</option>
-                    <option value="10">Oktober</option>
-                    <option value="11">November</option>
-                    <option value="12">Desember</option>
-                </select>
-            </div>
-
-            <div class="drop-area" id="pdfDrop">
-                📂 Drag & Drop File PDF / Klik untuk memilih
-                <input type="file" id="pdfFiles" multiple accept=".pdf" hidden>
-            </div>
-
-            <div id="fileList"></div>
-
-            <button id="btnUploadAll">Upload Semua File</button>
-
-            <div id="status"></div>
+        <!-- Upload PDF -->
+        <div id="uploadPdf" class="menuContent hidden">
+          <h2 class="text-2xl font-bold mb-4">Upload PDF</h2>
+          <div class="mb-4">
+            <label>Tahun:</label>
+            <select id="pdfYear" class="border p-2 rounded"></select>
+            <label>Bulan:</label>
+            <select id="pdfMonth" class="border p-2 rounded"></select>
+          </div>
+          <input type="file" id="pdfInput" accept=".pdf" multiple class="mb-4">
+          <div id="pdfFilesList" class="mb-4"></div>
+          <button id="uploadPdfBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Upload PDF</button>
+          <div id="pdfLoading" class="w-full bg-gray-200 rounded mt-4 hidden">
+            <div id="pdfProgress" class="bg-green-500 text-white text-center py-1 rounded" style="width: 0%">0%</div>
+          </div>
         </div>
-
+      </div>
     </div>
-</div>
+  </div>
+
+  <script src="utils.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
