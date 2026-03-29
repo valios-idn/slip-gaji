@@ -193,3 +193,38 @@ button:hover {
   color: #ef4444;
   transform: scale(1.2);
 }
+
+/* scroll smooth */
+#jsonOutput::-webkit-scrollbar {
+  width: 6px;
+}
+
+#jsonOutput::-webkit-scrollbar-thumb {
+  background: #22c55e;
+  border-radius: 10px;
+}
+
+/* JSON PREVIEW BOX */
+#jsonOutput {
+  width: 100%;
+  height: 300px;              /* 🔥 ukuran tetap */
+  margin-top: 10px;
+  padding: 15px;
+
+  background: #020617;        /* dark deep */
+  color: #22c55e;             /* neon green */
+
+  border: 1px solid #0f172a;
+  border-radius: 12px;
+
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.5;
+
+  overflow-y: auto;           /* scroll */
+  resize: none;               /* tidak bisa di-resize */
+
+  box-shadow: 
+    0 0 10px rgba(34,197,94,0.2),
+    inset 0 0 10px rgba(34,197,94,0.1);
+}
