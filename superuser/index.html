@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin Dashboard PRO+</title>
 
-<!-- STYLING -->
+<!-- CSS -->
 <link rel="stylesheet" href="admin-style.css">
 
 <!-- XLSX Library -->
@@ -17,83 +17,72 @@
 
 <!-- LOGIN -->
 <div class="login" id="loginPage">
-    <div class="login-box">
-        <h2>🔐 Admin Login</h2>
-        <input type="password" id="adminPass">
-        <button id="loginBtn">Login</button>
-    </div>
+  <div class="login-box">
+    <h2>🔐 Admin Login</h2>
+    <input type="password" id="adminPass" placeholder="Masukkan password">
+    <button id="loginBtn">Login</button>
+  </div>
 </div>
 
 <!-- APP -->
 <div class="wrapper hidden" id="app">
 
-    <!-- SIDEBAR -->
-    <div class="sidebar">
-        <h3>⚡ ADMIN</h3>
-        <div class="menu" id="menuDashboard">Dashboard</div>
-        <div class="menu" id="menuJSON">JSON Generator</div>
-        <div class="menu" id="menuUpload">Upload Slip</div>
-        <button id="logoutBtn" style="background:red; color:white;">Logout</button>
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <h3>⚡ ADMIN</h3>
+    <div class="menu" id="menuDashboard">Dashboard</div>
+    <div class="menu" id="menuJSON">JSON Generator</div>
+    <div class="menu" id="menuUpload">Upload Slip</div>
+    <button id="logoutBtn" style="background:red; color:white;">Logout</button>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div id="dashboardPage" class="card">
+      <h2>👋 Selamat Datang</h2>
     </div>
 
-    <!-- CONTENT -->
-    <div class="content">
-
-        <!-- DASHBOARD -->
-        <div id="dashboardPage" class="card">
-            <h2>👋 Selamat Datang</h2>
-        </div>
-
-        <!-- JSON -->
-        <div id="jsonPage" class="card hidden">
-            <h2>JSON Generator</h2>
-
-            <div class="drop-area" id="excelDrop">
-                📊 Drag & Drop Excel / Klik
-                <input type="file" id="excelFile" hidden>
-            </div>
-
-            <div id="jsonFileList"></div>
-
-            <button id="generateJSONBtn">Generate JSON</button>
-
-            <input type="text" id="tokenJson">
-            <button id="uploadJSONBtn">Upload JSON</button>
-
-            <textarea id="jsonOutput"></textarea>
-        </div>
-
-        <!-- UPLOAD -->
-        <div id="uploadPage" class="card hidden">
-            <h2>Upload Slip Gaji</h2>
-
-            <select id="tahun">
-                <option>2026</option>
-                <option>2027</option>
-            </select>
-
-            <select id="bulan">
-                <option value="01">Januari</option>
-                <option value="02">Februari</option>
-            </select>
-
-            <div class="drop-area" id="pdfDrop">
-                📂 Drag & Drop PDF / Klik
-                <input type="file" id="pdfFiles" multiple hidden>
-            </div>
-
-            <div id="fileList"></div>
-
-            <input type="text" id="tokenUpload">
-            <button id="uploadPDFBtn">Upload Semua</button>
-
-            <div id="status"></div>
-        </div>
-
+    <!-- JSON GENERATOR -->
+    <div id="jsonPage" class="card hidden">
+      <h2>JSON Generator</h2>
+      <div class="drop-area" id="excelDrop">
+        📊 Drag & Drop Excel / Klik
+        <input type="file" id="excelFile" hidden>
+      </div>
+      <div id="jsonFileList"></div>
+      <button id="generateJSONBtn">Generate JSON</button>
+      <input type="text" id="tokenJson">
+      <button id="uploadJSONBtn">Upload JSON</button>
+      <textarea id="jsonOutput"></textarea>
     </div>
+
+    <!-- UPLOAD PDF -->
+    <div id="uploadPage" class="card hidden">
+      <h2>Upload Slip Gaji</h2>
+      <select id="tahun">
+        <option>2026</option>
+        <option>2027</option>
+      </select>
+      <select id="bulan">
+        <option value="01">Januari</option>
+        <option value="02">Februari</option>
+      </select>
+      <div class="drop-area" id="pdfDrop">
+        📂 Drag & Drop PDF / Klik
+        <input type="file" id="pdfFiles" multiple hidden>
+      </div>
+      <div id="fileList"></div>
+      <input type="text" id="tokenUpload">
+      <button id="uploadPDFBtn">Upload Semua</button>
+      <div id="status"></div>
+    </div>
+
+  </div>
 </div>
 
-<!-- SCRIPT MODULE -->
-<script type="module" src="main.js"></script>
+<!-- SCRIPT -->
+<script type="module" src="main.js" defer></script>
 </body>
 </html>
