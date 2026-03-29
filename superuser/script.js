@@ -1,114 +1,143 @@
-// ===== Sidebar Menu =====
+// ===== Default Token =====
+let GITHUB_TOKEN = 'ghp_exampleToken123456';
+document.getElementById('github-token').value = GITHUB_TOKEN;
+document.getElementById('github-token').addEventListener('input', e => GITHUB_TOKEN = e.target.value);
+
+// ===== Sidebar switching =====
 const menuItems = document.querySelectorAll('.sidebar ul li');
 const menus = document.querySelectorAll('.menu-content');
-
 menuItems.forEach(item => {
   item.addEventListener('click', () => {
     menuItems.forEach(i => i.classList.remove('active'));
     item.classList.add('active');
-    const target = item.dataset.menu;
     menus.forEach(m => m.classList.remove('active'));
-    document.getElementById(target).classList.add('active');
+    document.getElementById(item.dataset.menu).classList.add('active');
   });
 });
 
-// ===== Tahun Dropdown =====
-function fillYears(selectId) {
-  const select = document.getElementById(selectId);
-  const year = new Date().getFullYear();
-  for(let i = year; i >= year-10; i--){
-    const option = document.createElement('option');
-    option.value = i;
-    option.textContent = i;
-    select.appendChild(option);
-  }
+// ===== Tahun dropdown =====
+function fillYears(id){
+  const sel = document.getElementById(id);
+  const y = new Date().getFullYear();
+  for(let i=y;i>=y-10;i--) sel.innerHTML += `<option value="${i}">${i}</option>`;
 }
 fillYears('tahun-dashboard');
 fillYears('tahun-upload');
 
-// ===== Load File List (Dashboard) =====
-document.getElementById('load-files').addEventListener('click', async () => {
+// ===== GitHub Helper =====
+async function ghRequest(path, method='GET', body=null){
+  const url = `https://api.github.com/repos/username/repo-gaji/contents/${path}`;
+  const opts = { method,
+    headers: { Authorization:`token ${GITHUB_TOKEN}`, Accept:'application/vnd.github.v3+json' }
+  };
+  if(body) opts.body = JSON.stringify(body);
+  const res = await fetch(url, opts);
+  return res.json();
+}
+
+// ===== Dashboard: list files =====
+document.getElementById('load-files').onclick = async ()=>{
   const year = document.getElementById('tahun-dashboard').value;
   const month = document.getElementById('bulan-dashboard').value;
-  const token = document.getElementById('github-token').value;
+  const path = `files/${year}/${month}`;
+  const data = await ghRequest(path);
+  const listEl = document.getElementById('file-list'); listEl.innerHTML = '';
+  if(data.message){ listEl.textContent=data.message; return; }
+  data.forEach(file=>{
+    listEl.innerHTML += `<div class="file-row">
+      <a href="${file.download_url}" target="_blank">${file.name}</a>
+      <button onclick="deleteGitHubFile('${file.path}','${file.sha}')">🗑️</button>
+    </div>`;
+  });
+}
 
-  // Placeholder: Replace with GitHub API fetch
-  const fileList = document.getElementById('file-list');
-  fileList.innerHTML = `<p>Menampilkan file untuk ${year}-${month}...</p>`;
-});
+// ===== Delete file =====
+async function deleteGitHubFile(path, sha){
+  if(!confirm('Yakin hapus file?')) return;
+  await ghRequest(path,'DELETE',{message:`Hapus ${path}`, sha});
+  alert('File dihapus!');
+  document.getElementById('load-files').click();
+}
 
-// ===== Excel Upload & Generate JSON =====
-let excelFiles = [];
-const excelInput = document.getElementById('excel-file');
-const excelListDiv = document.getElementById('excel-list');
-const jsonPreview = document.getElementById('json-preview');
-
-excelInput.addEventListener('change', (e) => {
+// ===== Excel & JSON =====
+let excelFiles = [], lastJson = [];
+document.getElementById('excel-file').onchange = e=>{
   excelFiles = Array.from(e.target.files);
-  renderExcelFiles();
-});
+  renderExcels();
+}
+function renderExcels(){
+  const list = document.getElementById('excel-list'); list.innerHTML='';
+  excelFiles.forEach((f,i)=>{
+    const div = document.createElement('div'); div.className='file-item';
+    div.innerHTML = `${f.name} <button onclick="removeExcel(${i})">&times;</button>`;
+    list.appendChild(div);
+  });
+}
+window.removeExcel=i=>{ excelFiles.splice(i,1); renderExcels(); }
 
-function renderExcelFiles() {
-  excelListDiv.innerHTML = '';
-  excelFiles.forEach((file, idx) => {
-    const div = document.createElement('div');
-    div.className = 'file-item';
-    div.innerHTML = `${file.name} <button onclick="removeExcel(${idx})">&times;</button>`;
-    excelListDiv.appendChild(div);
+document.getElementById('generate-json-btn').onclick = () => {
+  let arr = [];
+  excelFiles.forEach(file=>{
+    const reader = new FileReader();
+    reader.onload=e=>{
+      const wb = XLSX.read(e.target.result,{type:'array'});
+      wb.SheetNames.forEach(sn=>arr.push(...XLSX.utils.sheet_to_json(wb.Sheets[sn])));
+      document.getElementById('json-preview').textContent=JSON.stringify(arr,null,2);
+      lastJson=arr;
+    }
+    reader.readAsArrayBuffer(file);
   });
 }
 
-window.removeExcel = function(idx){
-  excelFiles.splice(idx,1);
-  renderExcelFiles();
+document.getElementById('upload-json-btn').onclick = async () => {
+  if(!lastJson.length){ alert('Generate JSON dulu!'); return; }
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(lastJson))));
+  await ghRequest('files/dataPegawai.json','PUT',{message:'Upload JSON', content});
+  alert('dataPegawai.json berhasil diupload!');
 }
 
-// Placeholder: Generate JSON (hash password)
-document.getElementById('generate-json-btn').addEventListener('click', async () => {
-  const result = excelFiles.map(f => ({
-    nama: f.name,
-    password: hashPassword(f.name)
-  }));
-  jsonPreview.textContent = JSON.stringify(result,null,2);
-
-  // TODO: Upload result to GitHub as dataPegawai.json
-  alert('JSON berhasil digenerate & siap diupload ke repo!');
-});
-
-// Simple hash function (SHA-256)
-async function hashPassword(str){
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-}
-
-// ===== Upload PDF =====
+// ===== PDF Upload Pro =====
+let pdfFiles = [];
 const pdfInput = document.getElementById('pdf-files');
-const pdfProgress = document.getElementById('pdf-progress');
-const uploadStatus = document.getElementById('upload-status');
+const pdfListDiv = document.getElementById('upload-status');
+const progressBar = document.getElementById('pdf-progress');
 
-document.getElementById('upload-pdf-btn').addEventListener('click', async () => {
-  const files = Array.from(pdfInput.files);
-  if(files.length===0){ alert('Pilih file PDF!'); return; }
+pdfInput.onchange = e=>{
+  pdfFiles = Array.from(e.target.files);
+  renderPdfList();
+}
 
-  pdfProgress.style.width = '0%';
-  uploadStatus.textContent = '';
-
-  for(let i=0;i<files.length;i++){
-    await fakeUpload(files[i], i, files.length);
-  }
-
-  uploadStatus.textContent = 'Semua file berhasil diupload!';
-  setTimeout(()=>{ uploadStatus.textContent=''; pdfProgress.style.width='0%'; }, 5000);
-});
-
-function fakeUpload(file, idx, total){
-  return new Promise(resolve=>{
-    let progress = 0;
-    const interval = setInterval(()=>{
-      progress += Math.random()*10;
-      if(progress>=100) progress=100;
-      pdfProgress.style.width = ((idx + progress/100)/total*100) + '%';
-      if(progress>=100){ clearInterval(interval); resolve(); }
-    }, 200);
+function renderPdfList(){
+  pdfListDiv.innerHTML='';
+  pdfFiles.forEach((f,i)=>{
+    const div = document.createElement('div'); div.className='file-item';
+    div.innerHTML = `${f.name} <button onclick="removePdf(${i})">&times;</button>`;
+    pdfListDiv.appendChild(div);
   });
+}
+
+window.removePdf=i=>{
+  pdfFiles.splice(i,1);
+  renderPdfList();
+}
+
+document.getElementById('upload-pdf-btn').onclick=async()=>{
+  const year = document.getElementById('tahun-upload').value;
+  const month = document.getElementById('bulan-upload').value;
+  if(!pdfFiles.length){ alert('Pilih file PDF!'); return; }
+
+  for(let i=0;i<pdfFiles.length;i++){
+    const f = pdfFiles[i];
+    const content = await new Promise(resolve=>{
+      const r = new FileReader();
+      r.onload=()=>resolve(btoa(r.result));
+      r.readAsBinaryString(f);
+    });
+    const path = `files/${year}/${month}/${f.name}`;
+    await ghRequest(path,'PUT',{message:`Upload PDF ${f.name}`, content});
+    progressBar.style.width=`${Math.round(((i+1)/pdfFiles.length)*100)}%`;
+  }
+  alert('Semua PDF berhasil diupload!');
+  pdfFiles=[]; renderPdfList();
+  setTimeout(()=>progressBar.style.width='0%',1000);
 }
