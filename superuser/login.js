@@ -1,13 +1,16 @@
 // login.js
-const ADMIN_HASH = "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9";
+const ADMIN_HASH = "eb8dd3569264665279b7715826fcf2a291b074137704e18d06574f321fd91a58";
 const SESSION_DURATION = 60 * 60 * 1000; // 60 menit
 
 let sessionTimeout;
 
-// ambil elemen
-const loginPage = document.getElementById("loginPage");
-const app = document.getElementById("app");
-const adminPass = document.getElementById("adminPass");
+let loginPage, app, adminPass;
+
+function initElements() {
+    loginPage = document.getElementById("loginPage");
+    app = document.getElementById("app");
+    adminPass = document.getElementById("adminPass");
+}
 
 // ================= HASH PASSWORD =================
 export async function hashPass(password) {
@@ -21,6 +24,7 @@ export async function hashPass(password) {
 
 // ================= LOGIN =================
 export async function login() {
+    if (!adminPass) initElements();
     if (!adminPass.value) {
         alert("⚠️ Masukkan password!");
         return;
@@ -47,6 +51,8 @@ export async function login() {
 
 // ================= SESSION =================
 export function checkSession() {
+    if (!loginPage || !app) initElements();
+
     const session = localStorage.getItem("adminSession");
     if (session) {
         const { expiresAt } = JSON.parse(session);
@@ -74,12 +80,14 @@ export function resetIdleTimer() {
 
 // ================= LOGOUT =================
 export function logout(isIdle = false) {
+    if (!loginPage || !app) initElements();
+
     localStorage.removeItem("adminSession");
     if (sessionTimeout) clearTimeout(sessionTimeout);
 
-    app.classList.add("hidden");
     loginPage.classList.remove("hidden");
-    adminPass.value = "";
+    app.classList.add("hidden");
+    if (adminPass) adminPass.value = "";
 
     if (isIdle) {
         alert("⏰ Session telah berakhir karena tidak ada aktivitas selama 1 jam.");
