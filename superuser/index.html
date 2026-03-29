@@ -3,74 +3,71 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Dashboard PRO+</title>
+<title>Admin Dashboard</title>
 
-<!-- CSS -->
 <link rel="stylesheet" href="admin-style.css">
 
-<!-- XLSX Library -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
-<div id="toast" class="toast"></div>
+<!-- LOGIN -->
+<div id="loginPage" class="card">
+  <h2>🔐 Login Admin</h2>
+  <input type="password" id="adminPass" placeholder="Password">
+  <button id="loginBtn">Login</button>
+</div>
 
-<div class="wrapper" id="app">
+<!-- APP -->
+<div class="wrapper hidden" id="app">
 
-  <!-- SIDEBAR -->
   <div class="sidebar">
     <h3>⚡ ADMIN</h3>
     <div class="menu" id="menuDashboard">Dashboard</div>
     <div class="menu" id="menuJSON">JSON Generator</div>
     <div class="menu" id="menuUpload">Upload Slip</div>
+    <div class="menu" id="menuLogout">Logout</div>
   </div>
 
-  <!-- CONTENT -->
   <div class="content">
 
-    <!-- DASHBOARD -->
     <div id="dashboardPage" class="card">
       <h2>👋 Selamat Datang</h2>
     </div>
 
-    <!-- JSON GENERATOR -->
     <div id="jsonPage" class="card hidden">
       <h2>JSON Generator</h2>
-      <div class="drop-area" id="excelDrop">
-        📊 Drag & Drop Excel / Klik
+      <div id="excelDrop" class="drop-area">
+        📊 Klik / Drop Excel
         <input type="file" id="excelFile" hidden>
       </div>
       <div id="jsonFileList"></div>
       <button id="generateJSONBtn">Generate JSON</button>
-      <input type="text" id="tokenJson" value="_pat_11CAL3MIA03YlOdbk6DTFt_K7vkaYfLDFxgt5w5chcvjunGjaWA79oRknfplcB62Df4IBWLSBJw41Bw1j1">
+      <input type="text" id="tokenJson" placeholder="GitHub Token">
       <button id="uploadJSONBtn">Upload JSON</button>
       <textarea id="jsonOutput"></textarea>
     </div>
 
-    <!-- UPLOAD PDF -->
     <div id="uploadPage" class="card hidden">
-      <h2>Upload Slip Gaji</h2>
-      <select id="tahun">
-        <option>2026</option>
-        <option>2027</option>
-      </select>
-      <select id="bulan">
-        <option value="01">Januari</option>
-        <option value="02">Februari</option>
-      </select>
-      <div class="drop-area" id="pdfDrop">
-        📂 Drag & Drop PDF / Klik
+      <h2>Upload PDF</h2>
+      <select id="tahun"><option>2026</option></select>
+      <select id="bulan"><option value="01">Januari</option></select>
+
+      <div id="pdfDrop" class="drop-area">
+        📂 Klik / Drop PDF
         <input type="file" id="pdfFiles" multiple hidden>
       </div>
+
       <div id="fileList"></div>
-      <input type="text" id="tokenUpload" value="_pat_11CAL3MIA03YlOdbk6DTFt_K7vkaYfLDFxgt5w5chcvjunGjaWA79oRknfplcB62Df4IBWLSBJw41Bw1j1">
-      <button id="uploadPDFBtn">Upload Semua</button>
-      <div id="status"></div>
+
+      <input type="text" id="tokenUpload" placeholder="GitHub Token">
+      <button id="uploadPDFBtn">Upload</button>
+
     </div>
 
   </div>
 </div>
 
-<script type="module" src="main.js" defer></script>
+<script type="module" src="main.js"></script>
 </body>
 </html>
