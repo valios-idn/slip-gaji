@@ -1,88 +1,108 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Panel Pro</title>
-<link rel="stylesheet" href="style.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Slip Gaji (GitHub Integrated)</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 
-<!-- LOGIN PANEL -->
-<div id="loginPanel">
-  <div class="login-box">
-    <h2 class="text-center mb-6">Admin Login</h2>
-    <input type="text" id="username" placeholder="Username">
-    <input type="password" id="password" placeholder="Password">
-    <button id="loginBtn">Login</button>
-    <p id="loginError" style="color:red;margin-top:10px;display:none;">Username atau password salah</p>
-  </div>
+<div class="sidebar">
+  <h2>Admin Panel</h2>
+  <ul>
+    <li class="active" data-menu="dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</li>
+    <li data-menu="generate-json"><i class="fas fa-file-code"></i> Generate JSON</li>
+    <li data-menu="upload-pdf"><i class="fas fa-file-upload"></i> Upload Slip Gaji</li>
+  </ul>
 </div>
 
-<!-- ADMIN PANEL -->
-<div id="adminPanel" style="display:flex; height:100vh;">
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <h2>Admin Panel</h2>
-    <button class="menuBtn" data-menu="dashboard">Dashboard</button>
-    <button class="menuBtn" data-menu="generateJson">Generate JSON</button>
-    <button class="menuBtn" data-menu="uploadPdf">Upload PDF</button>
-    <button id="logoutBtn">Log Out</button>
+<div class="main-content">
+  
+  <!-- Dashboard -->
+  <div class="menu-content active" id="dashboard">
+    <h2>Dashboard</h2>
+    <div class="dashboard-controls">
+      <label>Tahun:
+        <select id="tahun-dashboard"></select>
+      </label>
+      <label>Bulan:
+        <select id="bulan-dashboard">
+          <option value="01">Januari</option>
+          <option value="02">Februari</option>
+          <option value="03">Maret</option>
+          <option value="04">April</option>
+          <option value="05">Mei</option>
+          <option value="06">Juni</option>
+          <option value="07">Juli</option>
+          <option value="08">Agustus</option>
+          <option value="09">September</option>
+          <option value="10">Oktober</option>
+          <option value="11">November</option>
+          <option value="12">Desember</option>
+        </select>
+      </label>
+      <label>Token GitHub:
+        <input type="text" id="github-token" placeholder="Masukkan GitHub Token">
+      </label>
+      <label>Repo (user/repo):
+        <input type="text" id="github-repo" placeholder="contoh: user/repo-gaji">
+      </label>
+      <button id="load-files">Tampilkan File</button>
+    </div>
+    <div id="file-list"></div>
   </div>
 
-  <!-- Main content -->
-  <div class="main-content">
-    <!-- Dashboard -->
-    <div id="dashboard" class="menuContent card">
-      <h3>Dashboard</h3>
-      <div style="margin-bottom:10px;">
-        Tahun: <select id="selectYear"></select>
-        Bulan: <select id="selectMonth"></select>
-      </div>
-      <div style="margin-bottom:10px;">
-        GitHub Token: <input type="text" id="githubToken" style="width:100%;">
-      </div>
-      <button id="loadFiles" class="primary">Tampilkan File</button>
-      <ul id="fileList" class="file-list" style="margin-top:10px;"></ul>
-    </div>
-
-    <!-- Generate JSON -->
-    <div id="generateJson" class="menuContent card">
-      <h3>Generate JSON</h3>
-      <div id="dropZoneExcel" class="dropzone">
-        Drag & Drop Excel di sini atau klik
-        <input type="file" id="excelInput" accept=".xlsx" multiple hidden>
-      </div>
-      <div id="uploadedFiles" class="file-list"></div>
-      <button id="generateJsonBtn" class="success">Generate JSON</button>
-      <pre id="jsonPreview"></pre>
-      <button id="uploadJsonBtn" class="primary">Upload JSON ke GitHub</button>
-    </div>
-
-    <!-- Upload PDF -->
-    <div id="uploadPdf" class="menuContent card">
-      <h3>Upload PDF</h3>
-      <div style="margin-bottom:10px;">
-        Tahun: <select id="pdfYear"></select>
-        Bulan: <select id="pdfMonth"></select>
-      </div>
-      <div id="dropZonePdf" class="dropzone">
-        Drag & Drop PDF di sini atau klik
-        <input type="file" id="pdfInput" accept=".pdf" multiple hidden>
-      </div>
-      <div id="pdfFilesList" class="file-list"></div>
-      <button id="uploadPdfBtn" class="primary">Upload PDF</button>
-      <div id="pdfLoading">
-        <div id="pdfProgress">0%</div>
-      </div>
+  <!-- Generate JSON -->
+  <div class="menu-content" id="generate-json">
+    <h2>Generate JSON</h2>
+    <div class="generate-controls">
+      <input type="file" id="excel-file" accept=".xlsx, .xls" multiple>
+      <div id="excel-list"></div>
+      <button id="generate-json-btn">Generate JSON</button>
+      <button id="upload-json-btn">Upload ke GitHub</button>
+      <h3>Preview JSON:</h3>
+      <pre id="json-preview"></pre>
     </div>
   </div>
+
+  <!-- Upload PDF -->
+  <div class="menu-content" id="upload-pdf">
+    <h2>Upload Slip Gaji (PDF)</h2>
+    <div class="upload-controls">
+      <label>Tahun:
+        <select id="tahun-upload"></select>
+      </label>
+      <label>Bulan:
+        <select id="bulan-upload">
+          <option value="01">Januari</option>
+          <option value="02">Februari</option>
+          <option value="03">Maret</option>
+          <option value="04">April</option>
+          <option value="05">Mei</option>
+          <option value="06">Juni</option>
+          <option value="07">Juli</option>
+          <option value="08">Agustus</option>
+          <option value="09">September</option>
+          <option value="10">Oktober</option>
+          <option value="11">November</option>
+          <option value="12">Desember</option>
+        </select>
+      </label>
+      <input type="file" id="pdf-files" accept=".pdf" multiple>
+      <button id="upload-pdf-btn">Upload PDF</button>
+    </div>
+    <div class="progress-container">
+      <div class="progress-bar" id="pdf-progress"></div>
+    </div>
+    <div id="upload-status"></div>
+  </div>
+
 </div>
 
-<div id="toast" class="toast"></div>
-<script src="utils.js"></script>
-<script src="app.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="script.js"></script>
+
 </body>
 </html>
