@@ -39,9 +39,14 @@ excelFile.onchange = showExcel;
 function showExcel(){
     const f = excelFile.files[0];
     if(!f) return;
-    jsonFileList.innerHTML = f.name;
-}
 
+    jsonFileList.innerHTML = `
+        <div class="file-item">
+            ${f.name}
+            <span style="cursor:pointer;color:red;" onclick="removeExcel()">✖</span>
+        </div>
+    `;
+}
 // GENERATE JSON
 generateJSONBtn.onclick = async () => {
     const file = excelFile.files[0];
