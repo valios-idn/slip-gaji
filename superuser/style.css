@@ -35,7 +35,16 @@ body { background-color: #f3f4f6; color: #111; }
     padding: 20px;
     overflow-y: auto;
 }
-.menuContent { display: none; }
+.menuContent { display: none; padding-top: 10px; }
+
+/* Cards */
+.card {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
 
 /* Login panel */
 #loginPanel {
