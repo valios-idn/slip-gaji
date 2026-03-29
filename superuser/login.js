@@ -1,4 +1,4 @@
-const ADMIN_HASH = "6ca76d2dcf58b28ffb169e79247f7f50d091a74f34f226d8f78066e1b14c40fc"; // hash dari "admin123"
+const ADMIN_HASH = "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9"; // hash dari "admin123"
 const SESSION_DURATION = 60 * 60 * 1000;
 
 let sessionTimeout;
