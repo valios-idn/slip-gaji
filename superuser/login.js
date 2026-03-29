@@ -27,11 +27,19 @@ export async function login(){
 }
 
 export function checkSession(){
+    const loginPage = document.getElementById("loginPage");
+    const app = document.getElementById("app");
+
     const s = localStorage.getItem("session");
+
     if(s && Date.now() < s){
-        el("loginPage").classList.add("hidden");
-        el("app").classList.remove("hidden");
+        loginPage.classList.add("hidden");
+        app.classList.remove("hidden");
         startTimer();
+    } else {
+        // 🔥 INI YANG KURANG
+        loginPage.classList.remove("hidden");
+        app.classList.add("hidden");
     }
 }
 
