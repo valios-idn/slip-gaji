@@ -6,7 +6,7 @@ let jsonData = {};
 const el = id => document.getElementById(id);
 
 // INIT
-window.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("DOMContentLoaded", () => 
     checkSession();
 
     el("loginBtn").onclick = login;
@@ -15,7 +15,7 @@ window.addEventListener("DOMContentLoaded", () => {
         resetApp();
         logout();
     };
-};
+});
 
 document.addEventListener("click", resetIdleTimer);
 document.addEventListener("keydown", resetIdleTimer);
