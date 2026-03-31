@@ -362,3 +362,51 @@ button:hover {
   0% { transform: rotate(0deg);}
   100% { transform: rotate(360deg);}
 }
+
+.filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.filters input {
+  padding: 8px;
+  border-radius: 8px;
+  border: none;
+  min-width: 200px;
+}
+
+.filters button {
+  background: #22c55e;
+  border: none;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+#dashboardList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.file {
+  display: block;
+  text-decoration: none;
+  color: #cbd5f5;
+  background: #0f172a;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+.file:hover {
+  background: #2563eb;
+  color: white;
+}
+
+.empty {
+  color: #64748b;
+  font-size: 13px;
+}
