@@ -262,7 +262,7 @@ async function uploadPDF(){
     }
 
     // 🔥 auto hilang
-    setTimeout(()=>setUploadStatus(""), 2000);
+    setTimeout(()=>setUploadStatus(""), 10000);
 }
 
 async function uploadSingle(file, token, tahun, bulan){
@@ -426,12 +426,12 @@ window.deleteSingle = async (i) => {
         );
 
         setDeleteStatus("Selesai ✔");
-        setTimeout(()=>setDeleteStatus(""), 2000);
+        setTimeout(()=>setDeleteStatus(""), 10000);
         loadPDFList();
 
     }catch{
         setDeleteStatus("Gagal ❌");
-        setTimeout(()=>setDeleteStatus(""), 2000);
+        setTimeout(()=>setDeleteStatus(""), 10000);
     }
 };
 
@@ -468,11 +468,11 @@ async function deleteSelected(){
         }
 
         setDeleteStatus("Selesai ✔");
-        setTimeout(()=>setDeleteStatus(""), 2000);
+        setTimeout(()=>setDeleteStatus(""), 10000);
 
     }catch{
         setDeleteStatus("Gagal ❌");
-        setTimeout(()=>setDeleteStatus(""), 2000);
+        setTimeout(()=>setDeleteStatus(""), 10000);
     }
 
     loadPDFList();
