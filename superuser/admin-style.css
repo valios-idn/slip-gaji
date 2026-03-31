@@ -386,55 +386,69 @@ button:hover {
   cursor: pointer;
 }
 
+/* LIST CONTAINER */
 #dashboardList {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.file {
-  display: block;
-  text-decoration: none;
-  color: #cbd5f5;
-  background: #0f172a;
-  padding: 8px 12px;
-  border-radius: 6px;
-}
-
-.file:hover {
-  background: #2563eb;
-  color: white;
-}
-
-.empty {
-  color: #64748b;
-  font-size: 13px;
-}
-
-#fileCount {
-  margin-bottom: 10px;
-  font-weight: 600;
-}
-
+/* ROW */
 .file-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: 30px 1fr 80px;
   align-items: center;
-  gap: 10px;
-  background: #0f172a;
-  padding: 8px;
-  border-radius: 6px;
-}
-
-.file-row a {
-  flex: 1;
-  text-decoration: none;
-  color: #cbd5f5;
+  background: #1e293b;
+  padding: 10px 12px;
+  border-radius: 10px;
+  transition: 0.2s;
+  border: 1px solid transparent;
 }
 
 .file-row:hover {
-  background: #1e293b;
+  background: #0f172a;
+  border-color: #334155;
 }
 
-.file-row input {
+/* CHECKBOX */
+.file-check {
   transform: scale(1.2);
+  cursor: pointer;
+}
+
+/* FILE NAME */
+.file-name {
+  text-decoration: none;
+  color: #e2e8f0;
+  font-size: 14px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ACTION */
+.file-action {
+  text-align: right;
+}
+
+.open-btn {
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: #2563eb;
+  color: white;
+  text-decoration: none;
+}
+
+.open-btn:hover {
+  background: #1d4ed8;
+}
+
+/* COUNT */
+#fileCount {
+  margin-bottom: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  color: #cbd5f5;
 }
