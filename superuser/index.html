@@ -37,17 +37,28 @@
     </div>
 
     <div id="jsonPage" class="card hidden">
-      <h2>JSON Generator</h2>
-      <div id="excelDrop" class="drop-area">
-        📊 Klik / Drop Excel
-        <input type="file" id="excelFile" hidden>
-      </div>
-      <div id="jsonFileList"></div>
-      <button id="generateJSONBtn">Generate JSON</button>
-      <input type="text" id="tokenJson" placeholder="GitHub Token">
-      <button id="uploadJSONBtn">Upload JSON</button>
-      <textarea id="jsonOutput"></textarea>
-    </div>
+    <h2>JSON Generator</h2>
+
+<div id="excelDrop" class="drop-area">
+  📊 Klik / Drop Excel
+  <input type="file" id="excelFile" hidden>
+</div>
+
+<div id="jsonFileList"></div>
+
+<button id="generateJSONBtn">Generate JSON</button>
+
+<input type="text" id="tokenJson" placeholder="GitHub Token">
+
+<button id="uploadJSONBtn">Upload JSON</button>
+
+<!-- ✅ STATUS UPLOAD -->
+<div id="uploadStatus" class="upload-status">
+  <div id="spinner" class="spinner"></div>
+  <span id="statusText">Uploading...</span>
+</div>
+
+<textarea id="jsonOutput"></textarea>
 
     <div id="uploadPage" class="card hidden">
       <h2>Upload PDF</h2>
