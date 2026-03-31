@@ -33,8 +33,10 @@ body {
 
 
 .logo {
-  width: 110px;
+  width: 100%;
   margin-bottom: 10px; /* jarak ke tulisan ADMIN */
+  border-radius:10px;
+  
 }
 
 .sidebar h3 {
