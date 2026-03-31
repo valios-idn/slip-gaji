@@ -363,133 +363,107 @@ button:hover {
   100% { transform: rotate(360deg);}
 }
 
-/* =========================
-   DASHBOARD SAAS STYLE
-========================= */
+/* ======================
+   DASHBOARD LIST RAPI
+====================== */
 
 /* ACTION BAR */
 .dashboard-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
   margin-top: 15px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
-.dashboard-actions-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.dashboard-actions-right {
+/* TOTAL TEXT */
+#totalFile {
   font-size: 13px;
   color: #64748b;
-  font-weight: 500;
 }
 
-/* LIST CONTAINER */
+/* LIST */
 #dashboardList {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 14px;
-  margin-top: 20px;
-}
-
-/* FILE CARD */
-.dashboard-file {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 14px;
-  padding: 14px;
-
+  margin-top: 15px;
   display: flex;
   flex-direction: column;
+  gap: 8px;
+}
+
+/* ITEM */
+.dashboard-item {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
 
-  transition: all 0.25s ease;
-  cursor: pointer;
+  padding: 10px 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+
+  transition: 0.2s;
 }
 
 /* HOVER */
-.dashboard-file:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+.dashboard-item:hover {
+  background: #eff6ff;
   border-color: #3b82f6;
 }
 
-/* TOP */
-.file-top {
+/* LEFT */
+.dashboard-left {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-/* ICON */
-.file-icon {
-  font-size: 22px;
-}
-
-/* NAME */
-.file-name {
+/* FILE NAME */
+.dashboard-name {
   font-size: 13px;
-  font-weight: 500;
   color: #0f172a;
 
+  max-width: 300px;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 /* CHECKBOX */
 .file-check {
-  width: 16px;
-  height: 16px;
-  accent-color: #3b82f6;
+  width: 15px;
+  height: 15px;
   cursor: pointer;
 }
 
-/* FOOTER */
-.file-footer {
-  margin-top: 10px;
+/* ACTION BUTTONS */
+.dashboard-actions-btn {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  gap: 6px;
 }
 
-/* ACTION BTN */
-.file-btn {
+.dashboard-actions-btn button {
+  padding: 4px 8px;
   font-size: 12px;
-  padding: 6px 10px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  transition: 0.2s;
+  border-radius: 6px;
 }
 
+/* OPEN */
 .btn-open {
   background: #e0f2fe;
-  color: #0284c7;
+  color: #0369a1;
 }
 
 .btn-open:hover {
   background: #bae6fd;
 }
 
+/* DELETE */
 .btn-delete {
   background: #fee2e2;
-  color: #dc2626;
+  color: #b91c1c;
 }
 
 .btn-delete:hover {
   background: #fecaca;
-}
-
-/* EMPTY STATE */
-.empty {
-  text-align: center;
-  padding: 40px;
-  color: #94a3b8;
-  font-size: 14px;
 }
