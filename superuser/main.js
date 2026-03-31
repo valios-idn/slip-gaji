@@ -6,39 +6,40 @@ let jsonData = {};
 const el = id => document.getElementById(id);
 
 // ======================
-// INIT (AMAN)
+// INIT
 // ======================
 window.addEventListener("DOMContentLoaded", () => {
     checkSession();
 
-    // LOGIN
     el("loginBtn").onclick = login;
 
-    // LOGOUT
     el("menuLogout").onclick = () => {
         resetApp();
         logout();
     };
 
-
-    // NAVIGATION
     el("menuDashboard").onclick = ()=>showPage("dashboard");
     el("menuJSON").onclick = ()=>showPage("json");
     el("menuUpload").onclick = ()=>showPage("upload");
 
-     // ✅ FIX PENTING
+    // LOAD DASHBOARD
     const btn = el("btnLoadFile");
-    if(btn){
-        btn.addEventListener("click", loadPDFList);
-    } else {
-        console.error("❌ tombol btnLoadFile tidak ditemukan");
-};
+    if(btn) btn.addEventListener("click", loadPDFList);
+
+    // SELECT ALL
+    const selectAll = el("selectAll");
+    if(selectAll){
+        selectAll.onchange = function(){
+            document.querySelectorAll(".file-check").forEach(cb=>{
+                cb.checked = this.checked;
+            });
+        };
+    }
 
     // MENU ACTIVE
-    const menus = document.querySelectorAll('.menu');
-    menus.forEach(menu => {
-        menu.addEventListener('click', () => {
-            menus.forEach(m => m.classList.remove('active'));
+    document.querySelectorAll('.menu').forEach(menu=>{
+        menu.addEventListener('click', ()=>{
+            document.querySelectorAll('.menu').forEach(m=>m.classList.remove('active'));
             menu.classList.add('active');
         });
     });
@@ -54,17 +55,15 @@ window.addEventListener("DOMContentLoaded", () => {
         renderFiles();
     };
 
-    // BUTTONS
     el("generateJSONBtn").onclick = generateJSON;
     el("uploadJSONBtn").onclick = uploadJSON;
     el("uploadPDFBtn").onclick = uploadPDF;
+
+    // DELETE MULTI BUTTON
+    const btnDelete = el("btnDeleteSelected");
+    if(btnDelete) btnDelete.onclick = deleteSelected;
 });
 
-el("selectAll").onchange = function(){
-    document.querySelectorAll(".file-check").forEach(cb=>{
-        cb.checked = this.checked;
-    });
-};
 // ======================
 // GLOBAL EVENT
 // ======================
@@ -156,66 +155,37 @@ async function uploadJSON(){
     const token = el("tokenJson").value.trim();
     if (!token) return alert("Token kosong!");
 
-    const statusBox = el("uploadStatus");
-    const statusText = el("statusText");
-    const spinner = el("spinner");
-
-    statusBox.style.display = "flex";
-    statusText.innerText = "Uploading...";
-
     const url = `https://api.github.com/repos/valios-idn/slip-gaji/contents/dataPegawai.json`;
     const content = btoa(unescape(encodeURIComponent(JSON.stringify(jsonData, null, 2))));
 
     let sha = null;
 
     try {
-        const get = await fetch(url, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
-        if (get.ok) {
+        const get = await fetch(url,{ headers:{ Authorization:`Bearer ${token}` }});
+        if (get.ok){
             const data = await get.json();
             sha = data.sha;
         }
-    } catch (e) {}
+    } catch {}
 
-    const uploadWithRetry = async (retry = 3) => {
-        try {
-            const res = await fetch(url, {
-                method: "PUT",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    message: "update dataPegawai",
-                    content,
-                    sha
-                })
-            });
+    await fetch(url,{
+        method:"PUT",
+        headers:{
+            Authorization:`Bearer ${token}`,
+            "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+            message:"update dataPegawai",
+            content,
+            sha
+        })
+    });
 
-            const result = await res.json();
-            if (!res.ok) throw result;
-
-            spinner.style.display = "none";
-            statusText.innerText = "✅ Selesai upload";
-
-        } catch (err) {
-            if (retry > 0) {
-                statusText.innerText = `Retrying... (${retry})`;
-                await new Promise(r => setTimeout(r, 2000));
-                return uploadWithRetry(retry - 1);
-            } else {
-                spinner.style.display = "none";
-                statusText.innerText = "❌ Gagal upload";
-            }
-        }
-    };
-
-    await uploadWithRetry();
+    alert("✅ Upload JSON selesai");
 }
 
 // ======================
-// PDF VIEW
+// PDF UPLOAD
 // ======================
 function renderFiles(){
     const container = el("fileList");
@@ -227,12 +197,9 @@ function renderFiles(){
             <div style="display:flex; justify-content:space-between;">
                 <div>${f.name}</div>
                 <div>
-                    <span class="retry-btn hidden" id="retry${i}" onclick="retryUpload(${i})">🔄</span>
                     <span onclick="removeFile(${i})">✖</span>
                 </div>
             </div>
-            <div class="progress"><div id="bar${i}" class="bar"></div></div>
-            <div id="status${i}">Menunggu...</div>
         </div>`;
     });
 }
@@ -242,9 +209,6 @@ window.removeFile = (i)=>{
     renderFiles();
 };
 
-// ======================
-// UPLOAD PDF
-// ======================
 async function uploadPDF(){
     const token = el("tokenUpload").value.trim();
     if(!token) return alert("Token kosong!");
@@ -253,57 +217,31 @@ async function uploadPDF(){
     const bulan = el("bulan").value;
 
     for(let i=0;i<files.length;i++){
-        await uploadSingle(files[i], i, token, tahun, bulan);
+        await uploadSingle(files[i], token, tahun, bulan);
     }
+
+    alert("✅ Upload selesai");
 }
 
-async function uploadSingle(file,i,token,tahun,bulan){
-    const bar = el("bar"+i);
-    const status = el("status"+i);
-    const retryBtn = el("retry"+i);
+async function uploadSingle(file,token,tahun,bulan){
+    const path = `files/${tahun}/${bulan}/${file.name.toUpperCase()}`;
+    const url = `https://api.github.com/repos/valios-idn/slip-gaji/contents/${path}`;
 
-    try{
-        retryBtn.classList.add("hidden");
+    const base64 = await toBase64(file);
 
-        status.innerText = "Uploading...";
-        bar.style.width = "50%";
-
-        const path = `files/${tahun}/${bulan}/${file.name.toUpperCase()}`;
-        const url = `https://api.github.com/repos/valios-idn/slip-gaji/contents/${path}`;
-
-        const base64 = await toBase64(file);
-
-        const res = await fetch(url,{
-            method:"PUT",
-            headers:{
-                Authorization:`Bearer ${token}`,
-                "Content-Type":"application/json"
-            },
-            body: JSON.stringify({
-                message:"upload slip",
-                content:base64
-            })
-        });
-
-        if(!res.ok) throw new Error();
-
-        bar.style.width = "100%";
-        status.innerText = "✅ Selesai";
-
-    }catch{
-        status.innerText = "❌ Gagal";
-        retryBtn.classList.remove("hidden");
-    }
+    await fetch(url,{
+        method:"PUT",
+        headers:{
+            Authorization:`Bearer ${token}`,
+            "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+            message:"upload slip",
+            content:base64
+        })
+    });
 }
 
-window.retryUpload = (i)=>{
-    const token = el("tokenUpload").value.trim();
-    uploadSingle(files[i], i, token, el("tahun").value, el("bulan").value);
-};
-
-// ======================
-// BASE64
-// ======================
 function toBase64(file){
     return new Promise(r=>{
         const fr = new FileReader();
@@ -313,23 +251,8 @@ function toBase64(file){
 }
 
 // ======================
-// RESET (FIX UTAMA)
+// DASHBOARD
 // ======================
-function resetApp(){
-    jsonData = {};
-    files = [];
-
-    el("jsonOutput").value = "";
-    el("jsonFileList").innerHTML = "";
-    el("excelFile").value = "";
-
-    el("fileList").innerHTML = "";
-}
-
-// ======================
-// DASHBOARD (MATCH UPLOAD STYLE)
-// ======================
-
 async function loadPDFList(){
     const token = el("dashToken").value.trim();
     const tahun = el("dashTahun").value;
@@ -342,68 +265,54 @@ async function loadPDFList(){
     container.innerHTML = "Loading...";
 
     try{
-        const path = `files/${tahun}/${bulan}`;
-        const url = `https://api.github.com/repos/valios-idn/slip-gaji/contents/${path}`;
+        const url = `https://api.github.com/repos/valios-idn/slip-gaji/contents/files/${tahun}/${bulan}`;
 
         const res = await fetch(url,{
             headers:{ Authorization:`Bearer ${token}` }
         });
 
-        if(!res.ok) throw new Error();
-
         const data = await res.json();
 
         const pdfFiles = data.filter(f => f.name.toLowerCase().endsWith(".pdf"));
 
-        if(pdfFiles.length === 0){
-            container.innerHTML = `<div class="empty">Tidak ada file</div>`;
-            el("totalFile").innerText = "Total: 0";
-            return;
-        }
-
-        // 🔥 SIMPAN GLOBAL
         window.dashboardFiles = pdfFiles;
 
-       container.innerHTML = pdfFiles.map((f,i)=>`
-  <div class="dashboard-item">
+        container.innerHTML = pdfFiles.map((f,i)=>`
+            <div class="dashboard-item">
+                <div class="dashboard-left">
+                    <input type="checkbox" class="file-check" data-index="${i}">
+                    <span>📄</span>
+                    <div class="dashboard-name">${f.name}</div>
+                </div>
 
-    <div class="dashboard-left">
-      <input type="checkbox" class="file-check" data-index="${i}">
-      <span>📄</span>
-      <div class="dashboard-name">${f.name}</div>
-    </div>
+                <div class="dashboard-actions-btn">
+                    <button class="btn-open" onclick="window.open('${f.download_url}')">Buka</button>
+                    <button class="btn-delete" onclick="deleteSingle(${i})">Hapus</button>
+                </div>
+            </div>
+        `).join("");
 
-    <div class="dashboard-actions-btn">
-      <button class="btn-open" onclick="window.open('${f.download_url}')">
-        Buka
-      </button>
-      <button class="btn-delete" onclick="deleteSingle(${i})">
-        Hapus
-      </button>
-    </div>
+        el("totalFile").innerText = `Total: ${pdfFiles.length}`;
 
-  </div>
-`).join("");
-
-        //DELETE SINGLE
-
-    window.deleteSingle = async (i) => {
-    const token = el("dashToken").value.trim();
-    if(!token) return alert("Token kosong!");
-
-    const file = window.dashboardFiles[i];
-
-    if(!file){
-        alert("File tidak ditemukan");
-        return;
+    }catch{
+        container.innerHTML = "❌ Gagal load file";
     }
+}
+
+// ======================
+// DELETE SINGLE
+// ======================
+window.deleteSingle = async (i) => {
+    const token = el("dashToken").value.trim();
+    const file = window.dashboardFiles?.[i];
+
+    if(!file) return alert("File tidak ditemukan");
 
     if(!confirm(`Hapus ${file.name}?`)) return;
 
-    const url = `https://api.github.com/repos/valios-idn/slip-gaji/contents/${file.path}`;
-
-    try{
-        const res = await fetch(url,{
+    await fetch(
+        `https://api.github.com/repos/valios-idn/slip-gaji/contents/${file.path}`,
+        {
             method:"DELETE",
             headers:{
                 Authorization:`Bearer ${token}`,
@@ -413,85 +322,54 @@ async function loadPDFList(){
                 message:`delete ${file.name}`,
                 sha: file.sha
             })
-        });
-
-        const result = await res.json();
-
-        if(!res.ok){
-            console.error(result);
-            throw new Error(result.message);
         }
-
-        alert("✅ File berhasil dihapus");
-        loadPDFList();
-
-    }catch(err){
-        console.error(err);
-        alert("❌ Gagal hapus: " + err.message);
-    }
-};
-
-        //DELETE MULTI
-
-        el("btnDeleteSelected").onclick = async () => {
-    const token = el("dashToken").value.trim();
-    if(!token) return alert("Token kosong!");
-
-    const checked = document.querySelectorAll(".file-check:checked");
-
-    if(checked.length === 0){
-        alert("Tidak ada file dipilih");
-        return;
-    }
-
-    if(!confirm(`Hapus ${checked.length} file?`)) return;
-
-    let success = 0;
-    let failed = 0;
-
-    for(const cb of checked){
-        const index = cb.dataset.index;
-        const file = window.dashboardFiles[index];
-
-        try{
-            const res = await fetch(
-                `https://api.github.com/repos/valios-idn/slip-gaji/contents/${file.path}`,
-                {
-                    method:"DELETE",
-                    headers:{
-                        Authorization:`Bearer ${token}`,
-                        "Content-Type":"application/json"
-                    },
-                    body: JSON.stringify({
-                        message:`delete ${file.name}`,
-                        sha: file.sha
-                    })
-                }
-            );
-
-            if(res.ok){
-                success++;
-            }else{
-                const err = await res.json();
-                console.error(err);
-                failed++;
-            }
-
-        }catch(e){
-            console.error(e);
-            failed++;
-        }
-    }
-
-    alert(`Selesai\n✅ Berhasil: ${success}\n❌ Gagal: ${failed}`);
+    );
 
     loadPDFList();
 };
 
-        // 🔥 TOTAL
-        el("totalFile").innerText = `Total: ${pdfFiles.length}`;
+// ======================
+// DELETE MULTI
+// ======================
+async function deleteSelected(){
+    const token = el("dashToken").value.trim();
 
-    }catch{
-        container.innerHTML = "❌ Gagal load file";
+    const checked = document.querySelectorAll(".file-check:checked");
+    if(checked.length === 0) return alert("Tidak ada file dipilih");
+
+    if(!confirm(`Hapus ${checked.length} file?`)) return;
+
+    for(const cb of checked){
+        const file = window.dashboardFiles[cb.dataset.index];
+
+        await fetch(
+            `https://api.github.com/repos/valios-idn/slip-gaji/contents/${file.path}`,
+            {
+                method:"DELETE",
+                headers:{
+                    Authorization:`Bearer ${token}`,
+                    "Content-Type":"application/json"
+                },
+                body: JSON.stringify({
+                    message:`delete ${file.name}`,
+                    sha: file.sha
+                })
+            }
+        );
     }
+
+    alert("✅ Selesai hapus");
+    loadPDFList();
+}
+
+// ======================
+// RESET
+// ======================
+function resetApp(){
+    jsonData = {};
+    files = [];
+
+    el("jsonOutput").value = "";
+    el("jsonFileList").innerHTML = "";
+    el("fileList").innerHTML = "";
 }
