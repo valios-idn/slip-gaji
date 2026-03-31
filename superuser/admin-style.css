@@ -22,6 +22,11 @@ body {
 }
 
 /* ===== SIDEBAR ===== */
+.logo {
+  width: 250px;
+  margin-bottom: 10px;
+}
+
 .sidebar {
   width: 240px;
   background: #0f172a;
