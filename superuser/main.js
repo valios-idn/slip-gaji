@@ -25,6 +25,8 @@ window.addEventListener("DOMContentLoaded", () => {
     el("menuDashboard").onclick = ()=>showPage("dashboard");
     el("menuJSON").onclick = ()=>showPage("json");
     el("menuUpload").onclick = ()=>showPage("upload");
+    el("btnLoadFile").onclick = loadPDFList;
+    el("btnDeleteFile").onclick = deleteSelectedFiles;
 
      // ✅ FIX PENTING
     const btn = el("btnLoadFile");
@@ -326,49 +328,31 @@ function resetApp(){
 // ======================
 
 async function loadPDFList(){
-    console.log("🔥 tombol diklik");
+    const token = el("dashToken").value.trim();
+    if(!token) return alert("Token kosong!");
 
-    const token = el("dashToken")?.value.trim();
-    const tahun = el("dashTahun")?.value;
-    const bulan = el("dashBulan")?.value;
-    const container = el("dashboardList");
-
-    if(!container){
-        console.error("❌ dashboardList tidak ditemukan");
-        return;
-    }
-
-    if(!token){
-        alert("Token kosong!");
-        return;
-    }
+    const tahun = el("dashTahun").value;
+    const bulan = el("dashBulan").value;
 
     if(!tahun || !bulan){
-        alert("Pilih tahun & bulan!");
-        return;
+        return alert("Pilih tahun & bulan!");
     }
 
+    const container = el("dashboardList");
+    const counter = el("fileCount");
+
     container.innerHTML = "Loading...";
+    counter.innerHTML = "";
 
     try{
         const path = `files/${tahun}/${bulan}`;
         const url = `https://api.github.com/repos/valios-idn/slip-gaji/contents/${path}`;
 
-        console.log("📡 Fetch:", url);
-
         const res = await fetch(url,{
-            headers:{
-                Authorization:`Bearer ${token}`
-            }
+            headers:{ Authorization:`Bearer ${token}` }
         });
 
-        console.log("STATUS:", res.status);
-
-        if(!res.ok){
-            const text = await res.text();
-            console.error("❌ ERROR:", text);
-            throw new Error();
-        }
+        if(!res.ok) throw new Error();
 
         const data = await res.json();
 
@@ -376,19 +360,72 @@ async function loadPDFList(){
             .filter(f => f.name.toLowerCase().endsWith(".pdf"))
             .sort((a,b)=>a.name.localeCompare(b.name));
 
+        // ✅ COUNT
+        counter.innerHTML = `Total File: ${pdfFiles.length}`;
+
         if(pdfFiles.length === 0){
             container.innerHTML = `<div class="empty">Tidak ada file</div>`;
             return;
         }
 
         container.innerHTML = pdfFiles.map(f=>`
-            <a href="${f.download_url}" target="_blank" class="file">
-                📄 ${f.name}
-            </a>
+            <div class="file-row">
+                <input type="checkbox" class="file-check" 
+                    data-name="${f.name}" 
+                    data-path="${f.path}" 
+                    data-sha="${f.sha}">
+                
+                <a href="${f.download_url}" target="_blank">
+                    📄 ${f.name}
+                </a>
+            </div>
         `).join("");
 
-    }catch(err){
-        console.error(err);
-        container.innerHTML = "❌ Gagal load file (cek console)";
+    }catch{
+        container.innerHTML = "❌ Gagal load file";
     }
+}
+
+// MULTI DELETE
+async function deleteSelectedFiles(){
+    const token = el("dashToken").value.trim();
+    if(!token) return alert("Token kosong!");
+
+    const tahun = el("dashTahun").value;
+    const bulan = el("dashBulan").value;
+
+    const checks = document.querySelectorAll(".file-check:checked");
+
+    if(checks.length === 0){
+        return alert("Pilih file dulu!");
+    }
+
+    if(!confirm(`Hapus ${checks.length} file?`)) return;
+
+    for(let chk of checks){
+        const path = chk.dataset.path;
+        const sha = chk.dataset.sha;
+
+        const url = `https://api.github.com/repos/valios-idn/slip-gaji/contents/${path}`;
+
+        try{
+            await fetch(url,{
+                method:"DELETE",
+                headers:{
+                    Authorization:`Bearer ${token}`,
+                    "Content-Type":"application/json"
+                },
+                body: JSON.stringify({
+                    message: "hapus file",
+                    sha: sha
+                })
+            });
+
+        }catch{
+            console.log("gagal hapus:", path);
+        }
+    }
+
+    alert("Selesai hapus");
+    loadPDFList(); // refresh
 }
