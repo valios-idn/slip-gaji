@@ -22,18 +22,16 @@ body {
 }
 
 /* ===== SIDEBAR ===== */
-.logo {
-  width: 250px;
-  margin-bottom: 10px;
-}
-
 .sidebar {
-  width: 240px;
-  background: #0f172a;
-  color: #fff;
-  padding: 20px;
   display: flex;
   flex-direction: column;
+  align-items: center; /* biar tengah */
+  padding-top: 20px;
+}
+
+.logo {
+  width: 110px;
+  margin-bottom: 10px; /* jarak ke tulisan ADMIN */
 }
 
 .sidebar h3 {
