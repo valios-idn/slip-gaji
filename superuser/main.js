@@ -99,8 +99,6 @@ el("generateJSONBtn").onclick = async ()=>{
         jsonData = result;
         el("jsonOutput").value = JSON.stringify(result,null,2);
 
-        alert("✅ JSON berhasil dibuat!");
-    };
 
     reader.readAsArrayBuffer(file);
 };
@@ -142,9 +140,7 @@ el("uploadJSONBtn").onclick = async ()=>{
 
     if(!res.ok){
         console.error(result);
-        alert("❌ Upload gagal");
     }else{
-        alert("✅ JSON berhasil diupload!");
         console.log(result);
     }
 };
@@ -166,16 +162,26 @@ function renderFiles(){
     files.forEach((f,i)=>{
         container.innerHTML += `
         <div class="file-card">
-            <div class="file-name">${f.name}</div>
+            
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div class="file-name">${f.name}</div>
+                <span class="remove-btn" onclick="removeFile(${i})">✖</span>
+            </div>
 
             <div class="progress">
                 <div class="bar" id="bar${i}"></div>
             </div>
 
             <div class="file-status" id="status${i}">Menunggu...</div>
+
         </div>`;
     });
 }
+
+window.removeFile = (i)=>{
+    files.splice(i,1);
+    renderFiles();
+};
 
 // ======================
 // UPLOAD PDF (REALTIME)
@@ -187,27 +193,41 @@ el("uploadPDFBtn").onclick = async ()=>{
     const tahun = el("tahun").value;
     const bulan = el("bulan").value;
 
-    await Promise.all(
-        files.map((f,i)=>uploadSingle(f,i,token,tahun,bulan))
-    );
+for(let i=0;i<files.length;i++){
+    await uploadSingle(files[i], i, token, tahun, bulan);
+}
 
-    alert("✅ Semua upload selesai!");
-};
+    console.log("Upload selesai");
 
 async function uploadSingle(file,i,token,tahun,bulan){
     const bar = el("bar"+i);
     const status = el("status"+i);
 
     try{
+        status.innerText = "Checking...";
+        bar.style.width = "10%";
+
+        const path = `files/${tahun}/${bulan}/${file.name.toUpperCase()}`;
+        const url = `https://api.github.com/repos/valios-idn/slip-gaji/contents/${path}`;
+
+        // 🔍 CEK FILE ADA
+        let sha = null;
+        const check = await fetch(url,{
+            headers:{Authorization:`Bearer ${token}`}
+        });
+
+        if(check.ok){
+            const data = await check.json();
+            sha = data.sha;
+        }
+
         status.innerText = "Encoding...";
-        bar.style.width = "20%";
+        bar.style.width = "30%";
 
         const base64 = await toBase64(file);
 
         status.innerText = "Uploading...";
-        bar.style.width = "60%";
-
-        const url = `https://api.github.com/repos/valios-idn/slip-gaji/contents/files/${tahun}/${bulan}/${file.name.toUpperCase()}`;
+        bar.style.width = "70%";
 
         const res = await fetch(url,{
             method:"PUT",
@@ -217,21 +237,27 @@ async function uploadSingle(file,i,token,tahun,bulan){
             },
             body: JSON.stringify({
                 message:"upload slip",
-                content:base64
+                content:base64,
+                sha // 🔥 penting untuk update
             })
         });
 
-        if(!res.ok) throw new Error();
+        if(!res.ok){
+            const err = await res.json();
+            throw new Error(err.message);
+        }
 
         bar.style.width = "100%";
         status.innerText = "✅ Selesai";
 
     }catch(e){
+        console.error(e);
         bar.style.background = "#ef4444";
-        status.innerText = "❌ Gagal";
+        status.innerText = "❌ " + e.message;
     }
 }
 
+await new Promise(r => setTimeout(r, 300));
 // ======================
 // BASE64
 // ======================
