@@ -258,8 +258,8 @@ async function loadPDFList(){
     const tahun = el("dashTahun").value;
     const bulan = el("dashBulan").value;
     const container = el("dashboardList");
-    const bulkActions = el("dashboardActions");  
-
+    const bulk = el("bulkActions");
+    
     if(!token) return alert("Token kosong!");
     if(!tahun || !bulan) return alert("Pilih tahun & bulan!");
 
