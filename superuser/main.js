@@ -311,3 +311,92 @@ function resetApp(){
 
     el("fileList").innerHTML = "";
 }
+
+// ======================
+// DASHBOARD FINAL (TOKEN INPUT)
+// ======================
+
+async function fetchGitHub(path, token){
+    const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${path}`;
+    
+    const res = await fetch(url,{
+        headers: token ? {
+            Authorization: "Bearer " + token
+        } : {}
+    });
+
+    return res.json();
+}
+
+// LOAD TAHUN (tanpa token)
+async function loadTahun(){
+    const tahunSelect = el("dashTahun");
+    tahunSelect.innerHTML = `<option value="">Pilih Tahun</option>`;
+
+    const years = await fetchGitHub(GITHUB_BASE);
+
+    years
+        .filter(y => y.type === "dir")
+        .sort((a,b)=>a.name.localeCompare(b.name))
+        .forEach(y=>{
+            tahunSelect.innerHTML += `<option value="${y.name}">${y.name}</option>`;
+        });
+}
+
+// LOAD BULAN
+async function loadBulan(tahun){
+    const bulanSelect = el("dashBulan");
+    bulanSelect.innerHTML = `<option value="">Pilih Bulan</option>`;
+
+    if(!tahun) return;
+
+    const months = await fetchGitHub(`${GITHUB_BASE}/${tahun}`);
+
+    months
+        .filter(m => m.type === "dir")
+        .sort((a,b)=>a.name.localeCompare(b.name))
+        .forEach(m=>{
+            bulanSelect.innerHTML += `<option value="${m.name}">${m.name}</option>`;
+        });
+}
+
+// LOAD FILE (pakai token manual)
+async function loadFilesWithToken(){
+    const tahun = el("dashTahun").value;
+    const bulan = el("dashBulan").value;
+    const token = el("dashToken").value.trim();
+
+    const container = el("dashboardList");
+
+    if(!tahun || !bulan){
+        return alert("Pilih tahun & bulan!");
+    }
+
+    if(!token){
+        return alert("Token wajib diisi!");
+    }
+
+    container.innerHTML = "Loading...";
+
+    try{
+        const files = await fetchGitHub(`${GITHUB_BASE}/${tahun}/${bulan}`, token);
+
+        const pdfFiles = files
+            .filter(f => f.name.toLowerCase().endsWith(".pdf"))
+            .sort((a,b)=>a.name.localeCompare(b.name));
+
+        if(pdfFiles.length === 0){
+            container.innerHTML = `<div class="empty">Tidak ada file</div>`;
+            return;
+        }
+
+        container.innerHTML = pdfFiles.map(f=>`
+            <a href="${f.download_url}" target="_blank" class="file">
+                📄 ${f.name}
+            </a>
+        `).join("");
+
+    }catch{
+        container.innerHTML = "❌ Gagal load file";
+    }
+}
