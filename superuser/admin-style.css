@@ -377,6 +377,11 @@ button:hover {
   min-width: 200px;
 }
 
+input#dashToken {
+    border: 1px solid #e2e8f0;
+}
+}
+
 .filters button {
   background: #22c55e;
   border: none;
