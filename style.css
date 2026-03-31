@@ -35,9 +35,18 @@ body {
 
 /* TITLE */
 h1 {
-  font-size: 28px;
+  font-size: 26px;
+  font-weight: 700;
+  text-align: center;
   margin-bottom: 20px;
-  color: #1e3a8a;
+
+  background: linear-gradient(135deg, #38bdf8, #6366f1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  letter-spacing: 0.5px;
+
+  text-shadow: 0 5px 20px rgba(99, 102, 241, 0.2);
 }
 
 /* FORM */
