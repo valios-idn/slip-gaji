@@ -165,7 +165,10 @@ function renderFiles(){
             
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <div class="file-name">${f.name}</div>
-                <span class="remove-btn" onclick="removeFile(${i})">✖</span>
+                <div>
+                    <span class="retry-btn hidden" id="retry${i}" onclick="retryUpload(${i})">🔄</span>
+                    <span class="remove-btn" onclick="removeFile(${i})">✖</span>
+                </div>
             </div>
 
             <div class="progress">
@@ -177,6 +180,16 @@ function renderFiles(){
         </div>`;
     });
 }
+
+window.retryUpload = (i)=>{
+    const token = el("tokenUpload").value.trim();
+    const tahun = el("tahun").value;
+    const bulan = el("bulan").value;
+
+    if(!token) return;
+
+    uploadSingle(files[i], i, token, tahun, bulan);
+};
 
 window.removeFile = (i)=>{
     files.splice(i,1);
@@ -202,15 +215,18 @@ for(let i=0;i<files.length;i++){
 async function uploadSingle(file,i,token,tahun,bulan){
     const bar = el("bar"+i);
     const status = el("status"+i);
+    const retryBtn = el("retry"+i);
 
     try{
+        retryBtn.classList.add("hidden");
+
         status.innerText = "Checking...";
         bar.style.width = "10%";
+        bar.style.background = "#22c55e";
 
         const path = `files/${tahun}/${bulan}/${file.name.toUpperCase()}`;
         const url = `https://api.github.com/repos/valios-idn/slip-gaji/contents/${path}`;
 
-        // 🔍 CEK FILE ADA
         let sha = null;
         const check = await fetch(url,{
             headers:{Authorization:`Bearer ${token}`}
@@ -238,7 +254,7 @@ async function uploadSingle(file,i,token,tahun,bulan){
             body: JSON.stringify({
                 message:"upload slip",
                 content:base64,
-                sha // 🔥 penting untuk update
+                sha
             })
         });
 
@@ -252,11 +268,14 @@ async function uploadSingle(file,i,token,tahun,bulan){
 
     }catch(e){
         console.error(e);
+
         bar.style.background = "#ef4444";
-        status.innerText = "❌ " + e.message;
+        status.innerText = "❌ Gagal";
+
+        // 🔥 tampilkan tombol retry
+        retryBtn.classList.remove("hidden");
     }
 }
-
 await new Promise(r => setTimeout(r, 300));
 // ======================
 // BASE64
