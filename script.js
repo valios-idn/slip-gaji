@@ -88,6 +88,7 @@ const emailInput = document.getElementById('email').value.trim().toLowerCase();
 const password = document.getElementById('password').value.trim();
 
 errorDiv.textContent = '';
+downloadBtn.classList.add("hidden");
 viewer.innerHTML = '';
 viewerContainer.style.display = 'none';
 
@@ -148,12 +149,14 @@ viewer.appendChild(canvas);
 
 setupLazyLoading();
 viewerContainer.style.display = 'block';
+downloadBtn.classList.remove("hidden");
 
 showNotif(`Slip gaji ${namaFileAsli} berhasil dimuat`, 'success');
 
 } catch (err) {
 console.error(err);
 showNotif('PDF tidak ditemukan / gagal dimuat!', 'error');
+downloadBtn.classList.add("hidden");
 }
 
 hideLoading();
