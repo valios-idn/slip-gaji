@@ -190,7 +190,7 @@ input:focus, select:focus {
 }
 
 /* ===== DOWNLOAD BUTTON ===== */
-{
+.download-btn {
   position: static;
   margin-top: 10px;
   z-index: 9999;
