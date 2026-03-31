@@ -258,12 +258,18 @@ async function loadPDFList(){
     const tahun = el("dashTahun").value;
     const bulan = el("dashBulan").value;
     const container = el("dashboardList");
+
+    // 🔥 ambil bulkActions
     const bulk = el("bulkActions");
-    
+
     if(!token) return alert("Token kosong!");
     if(!tahun || !bulan) return alert("Pilih tahun & bulan!");
 
+    // ======================
+    // A. LOADING (RESET)
+    // ======================
     container.innerHTML = "Loading...";
+    bulk.classList.add("hidden");
 
     try{
         const url = `https://api.github.com/repos/valios-idn/slip-gaji/contents/files/${tahun}/${bulan}`;
@@ -276,8 +282,21 @@ async function loadPDFList(){
 
         const pdfFiles = data.filter(f => f.name.toLowerCase().endsWith(".pdf"));
 
+        // ======================
+        // B. TIDAK ADA FILE
+        // ======================
+        if(pdfFiles.length === 0){
+            container.innerHTML = `<div class="empty">Tidak ada file</div>`;
+            el("totalFile").innerText = "Total: 0";
+
+            bulk.classList.add("hidden");
+            return;
+        }
+
+        // simpan global
         window.dashboardFiles = pdfFiles;
 
+        // render list
         container.innerHTML = pdfFiles.map((f,i)=>`
             <div class="dashboard-item">
                 <div class="dashboard-left">
@@ -293,10 +312,23 @@ async function loadPDFList(){
             </div>
         `).join("");
 
+        // ======================
+        // C. ADA FILE → TAMPILKAN
+        // ======================
+        bulk.classList.remove("hidden");
+
+        // total
         el("totalFile").innerText = `Total: ${pdfFiles.length}`;
 
-    }catch{
+    }catch(err){
+        console.error(err);
+
         container.innerHTML = "❌ Gagal load file";
+
+        // ======================
+        // OPTIONAL (ERROR)
+        // ======================
+        bulk.classList.add("hidden");
     }
 }
 
