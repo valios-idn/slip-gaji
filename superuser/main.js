@@ -106,45 +106,72 @@ el("generateJSONBtn").onclick = async ()=>{
 // ======================
 // UPLOAD JSON
 // ======================
-el("uploadJSONBtn").onclick = async ()=>{
+el("uploadJSONBtn").onclick = async () => {
     const token = el("tokenJson").value.trim();
-    if(!token) return alert("Token kosong!");
+    if (!token) return alert("Token kosong!");
+
+    const statusBox = el("uploadStatus");
+    const statusText = el("statusText");
+    const spinner = el("spinner");
+
+    statusBox.style.display = "flex";
+    statusText.innerText = "Uploading...";
 
     const url = `https://api.github.com/repos/valios-idn/slip-gaji/contents/dataPegawai.json`;
-    const content = btoa(unescape(encodeURIComponent(JSON.stringify(jsonData,null,2))));
+    const content = btoa(unescape(encodeURIComponent(JSON.stringify(jsonData, null, 2))));
 
     let sha = null;
 
-    try{
-        const get = await fetch(url,{headers:{Authorization:`Bearer ${token}`}});
-        if(get.ok){
+    try {
+        const get = await fetch(url, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        if (get.ok) {
             const data = await get.json();
             sha = data.sha;
         }
-    }catch(e){}
+    } catch (e) {}
 
-    const res = await fetch(url,{
-        method:"PUT",
-        headers:{
-            Authorization:`Bearer ${token}`,
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            message:"update dataPegawai",
-            content,
-            sha
-        })
-    });
+    // 🔁 Retry function
+    const uploadWithRetry = async (retry = 3) => {
+        try {
+            const res = await fetch(url, {
+                method: "PUT",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    message: "update dataPegawai",
+                    content,
+                    sha
+                })
+            });
 
-    const result = await res.json();
+            const result = await res.json();
 
-    console.log("Upload selesai");
+            if (!res.ok) throw result;
 
-    if(!res.ok){
-        console.error(result);
-    }else{
-        console.log(result);
-    }
+            // ✅ SUCCESS
+            spinner.style.display = "none";
+            statusText.innerText = "✅ Selesai upload";
+            console.log(result);
+
+        } catch (err) {
+            console.error("Gagal upload:", err);
+
+            if (retry > 0) {
+                statusText.innerText = `Retrying... (${retry})`;
+                await new Promise(r => setTimeout(r, 2000));
+                return uploadWithRetry(retry - 1);
+            } else {
+                spinner.style.display = "none";
+                statusText.innerText = "❌ Gagal upload";
+            }
+        }
+    };
+
+    await uploadWithRetry();
 };
 
 // ======================
