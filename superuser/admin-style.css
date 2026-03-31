@@ -40,10 +40,11 @@ body {
 }
 
 .sidebar h3 {
-  font-size: 18px;
-  margin-bottom: 30px;
-  font-weight: 600;
-  letter-spacing: 1px;
+    font-size: 21px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    padding: 12px;
+    color: #ffd966;
 }
 
 /* MENU */
