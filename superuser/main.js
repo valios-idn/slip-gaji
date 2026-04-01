@@ -266,7 +266,7 @@ async function uploadPDF(){
 }
 
 async function uploadSingle(file, token, tahun, bulan){
-    const path = `files/${tahun}/${bulan}/${file.name.toUpperCase()}`;
+    const path = `files/${tahun}/${bulan}/${file.name}`;
     const url = `https://api.github.com/repos/valios-idn/slip-gaji/contents/${path}`;
 
     const base64 = await toBase64(file);
