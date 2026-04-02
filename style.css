@@ -270,7 +270,7 @@ input:focus, select:focus {
 /* ===== NOTIF ===== */
 .notif {
   position: fixed;
-  top: 30px;
+  top: inherit;
   right: inherit;
   background: #0f172a;
   color: white;
